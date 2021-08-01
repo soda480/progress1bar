@@ -50,6 +50,7 @@ class ProgressBar(object):
         self.__dict__['count'] = 0
         self.__dict__['total'] = total
         if total:
+            # print progress bar if total specified in constructor
             self._print(False)
 
     def __str__(self):
@@ -81,14 +82,14 @@ class ProgressBar(object):
             self._print(name == 'count')
 
     def __enter__(self):
-        """ hide cursor if aware and stderr is attached to tty
+        """ on entry - hide cursor if aware and stderr is attached to tty
         """
         if self.aware and sys.stderr.isatty():
             cursor.hide()
         return self
 
     def __exit__(self, *args):
-        """ show cursor if aware and stderr is attached to tty
+        """ on exit - show cursor if aware and stderr is attached to tty and print progress bar
         """
         if self.clear_alias:
             self.alias = ''
@@ -104,7 +105,7 @@ class ProgressBar(object):
         if not self.aware or not sys.stderr.isatty():
             return
         if clear or self._reset:
-            print(f'{Cursor.UP(0)}{CLEAR_EOL}', end='', file=sys.stderr)
+            print(f'{Cursor.UP(1)}{CLEAR_EOL}', end='', file=sys.stderr)
         print(self, file=sys.stderr)
         sys.stderr.flush()
 

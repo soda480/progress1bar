@@ -16,7 +16,7 @@ pip install progress1bar
 
 ### `ProgressBar`
 
-Use the `ProgressBar` class to display your function's execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
+The `ProgressBar` class is used to display function execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
 ```python
 import names, random, time
 from progress1bar import ProgressBar
@@ -25,8 +25,8 @@ with ProgressBar() as pb:
     pb.alias = names.get_full_name()
     pb.total = random.randint(50, 100)
     for _ in range(pb.total):
-        pb.count += 1
         # simulate work
+        pb.count += 1
         time.sleep(.09)
 ```
 Executing the code above ([example1](https://github.com/soda480/progress1bar/tree/master/examples/example1.py)) results in the following:
@@ -36,25 +36,24 @@ Executing the code above ([example1](https://github.com/soda480/progress1bar/tre
 
 Various [examples](https://github.com/soda480/progress1bar/tree/master/examples) are included to demonstrate the progress1bar package. To run the examples, build the Docker image and run the Docker container using the instructions described in the [Development](#development) section.
 
-Configure `ProgressBar` to display the item that is currently being processd by setting `alias` attribute:
+Configure `ProgressBar` to display the item that is currently being processd by setting the `alias` attribute, specify fill dictionary parameter to ensure the progress bar digits are displayed uniformly:
 ```python
-import time, names
+import names
 from progress1bar import ProgressBar
 
 print('Processing names...')
 completed_message = 'Done processing all names'
-fill = {'max_index': 1, 'max_total': 9}
-with ProgressBar(index=0, total=9, completed_message=completed_message, fill=fill, clear_alias=True) as pb:
+fill = {'max_index': 9, 'max_total': 999}
+with ProgressBar(index=1, total=500, completed_message=completed_message, fill=fill, clear_alias=True) as pb:
     for _ in range(pb.total):
         pb.alias = names.get_full_name()
-        pb.count += 1
         # simulate work
-        time.sleep(.5)
+        pb.count += 1
 ```
 Executing the code above ([example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)) results in the following:
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
 
-Configure `ProgressBar` to use regular expressions to determine the total, cound and alias from logged messages:
+Configure `ProgressBar` to use regular expressions to determine the `total`, `count` and `alias` attributes:
 ```python
 import names, random, logging
 from progress1bar import ProgressBar
@@ -86,7 +85,7 @@ with ProgressBar(regex=regex, fill=fill) as pb:
 Executing the code above ([example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)) results in the following:
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example3.gif)
 
-Configure `ProgressBar` to show progress for several iterations:
+Configure `ProgressBar` to show and reuse progress for several iterations:
 ```python
 import names, random
 from progress1bar import ProgressBar
@@ -133,7 +132,7 @@ docker container run \
 -it \
 -v $PWD:/progress1bar \
 progress1bar:latest \
-/bin/sh
+/bin/bash
 ```
 
 Execute the build:
