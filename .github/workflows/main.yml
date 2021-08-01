@@ -18,10 +18,10 @@ jobs:
       run: pip install pybuilder
 
     - name: Install dependencies
-      run: pyb install_dependencies --no-venvs
+      run: pyb install_dependencies
 
     - name: Execute build
-      run: pyb -X --no-venvs
+      run: pyb -X
 
     - name: Install Codecov requirements
       run: |

@@ -20,6 +20,7 @@ version = '0.0.1'
 default_task = [
     'clean',
     'analyze',
+    'publish',
     'radon',
     'bandit',
     'anybadge',
