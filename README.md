@@ -18,11 +18,11 @@ pip install progress1bar
 
 Use the `ProgressBar` class to display your function's execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
 ```python
-import random, time
-from mp4ansi import ProgressBar
+import names, random, time
+from progress1bar import ProgressBar
 
 with ProgressBar() as pb:
-    pb.alias = 'Super 80s'
+    pb.alias = names.get_full_name()
     pb.total = random.randint(50, 100)
     for _ in range(pb.total):
         pb.count += 1
