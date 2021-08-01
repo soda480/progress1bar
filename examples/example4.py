@@ -9,6 +9,7 @@ fill = {
     'max_total': TOTAL_ITEMS,
     'max_completed': TOTAL_NAMES
 }
+print(f'Each processor will proces {TOTAL_NAMES} iterations of varying counts...')
 with ProgressBar(fill=fill) as pb:
     total_names = 0
     while True:

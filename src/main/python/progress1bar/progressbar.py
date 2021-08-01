@@ -1,13 +1,13 @@
 import re
 import sys
-import cursor
 import logging
 
-from colorama import init as colorama_init
+import cursor
 from colorama import Style
 from colorama import Fore
 from colorama import Back
 from colorama import Cursor
+from colorama import init as colorama_init
 
 logger = logging.getLogger(__name__)
 
@@ -98,8 +98,8 @@ class ProgressBar(object):
 
     def _print(self, clear):
         """ print progress bar on certain conditions
-            sys.stderr is attached to a tty and is aware
-            clear line prior to printing if clear is set
+            sys.stderr is attached to a tty and if progress bar is aware
+            clear line prior to printing if clear is set or if progress bar has been reset
         """
         if not self.aware or not sys.stderr.isatty():
             return
@@ -113,7 +113,6 @@ class ProgressBar(object):
         """
         logger.debug('resetting progress bar')
         self.alias = ''
-        # self.total = None
         self.__dict__['total'] = None
         self._complete = False
         self._modulus_count = 0

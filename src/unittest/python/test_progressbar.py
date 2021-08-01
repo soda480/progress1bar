@@ -1,18 +1,3 @@
-
-# Copyright (c) 2021 Intel Corporation
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#      http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import string
 import unittest
 from mock import patch
@@ -320,6 +305,15 @@ class TestProgressBar(unittest.TestCase):
             cursor_patch.hide.assert_not_called()
             self.assertTrue(pb.aware)
         cursor_patch.show.assert_not_called()
+
+    @patch('progress1bar.ProgressBar._print')
+    @patch('progress1bar.progressbar.cursor')
+    @patch('progress1bar.progressbar.sys.stderr')
+    def test__enter_exit_Should_ClearAlias_When_ClearAlias(self, stderr_patch, cursor_patch, *patches):
+        stderr_patch.isatty.return_value = True
+        with ProgressBar(clear_alias=True) as pb:
+            pb.alias = 'something'
+        self.assertEqual(pb.alias, '')
 
     @patch('progress1bar.progressbar.sys.stderr')
     def test__print_Should_Return_When_NoTty(self, stderr_patch, *patches):
