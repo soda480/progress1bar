@@ -4,6 +4,7 @@
 [![Code Grade](https://www.code-inspector.com/project/25921/status/svg)](https://frontend.code-inspector.com/project/25921/dashboard)
 [![complexity](https://img.shields.io/badge/complexity-Simple:%205-brightgreen)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
 [![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
+[![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
 [![python](https://img.shields.io/badge/python-3.9-teal)](https://www.python.org/downloads/)
 
 A simple ANSI-based progress bar.
