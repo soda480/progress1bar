@@ -73,13 +73,22 @@ class ProgressBar(object):
     def __setattr__(self, name, value):
         """ set class instance attributes
         """
+        def _check(name, value):
+            """ check function
+            """
+            if name in ['total', 'count']:
+                if name == 'count':
+                    self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
+                else:
+                    if value == 0:
+                        # if total is zero then set complete
+                        self._complete = True
+                self._print(name == 'count')
+
         if name == 'count' and self.total is None:
             return
         super(ProgressBar, self).__setattr__(name, value)
-        if name == 'count':
-            self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
-        if name in ['total', 'count']:
-            self._print(name == 'count')
+        _check(name, value)
 
     def __enter__(self):
         """ on entry - hide cursor if aware and stderr is attached to tty

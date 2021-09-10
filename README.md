@@ -130,7 +130,7 @@ Run the Docker container:
 docker container run \
 --rm \
 -it \
--v $PWD:/progress1bar \
+-v $PWD:/code \
 progress1bar:latest \
 /bin/bash
 ```
