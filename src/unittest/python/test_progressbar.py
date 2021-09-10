@@ -105,6 +105,12 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(pbar._modulus_count, 0)
 
     @patch('progress1bar.progressbar.colorama_init')
+    def test__setattr_Should_SetExpected_When_TotalIsZero(self, *patches):
+        pbar = ProgressBar(aware=False, index=0)
+        pbar.total = 0
+        self.assertEqual(pbar._complete, True)
+
+    @patch('progress1bar.progressbar.colorama_init')
     @patch('progress1bar.progressbar.ProgressBar._match_count', return_value=True)
     @patch('progress1bar.progressbar.ProgressBar._match_alias', return_value=False)
     @patch('progress1bar.progressbar.ProgressBar._match_total', return_value=False)

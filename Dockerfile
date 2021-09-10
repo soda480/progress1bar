@@ -3,9 +3,9 @@ FROM python:3.9-slim
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-WORKDIR /progress1bar
+WORKDIR /code
 
-COPY . /progress1bar/
+COPY . /code/
 
 RUN pip install pybuilder names
 RUN pyb install_dependencies
