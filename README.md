@@ -120,19 +120,12 @@ Clone the repository and ensure the latest version of Docker is installed on you
 
 Build the Docker image:
 ```sh
-docker image build \
--t \
-progress1bar:latest .
+docker image build -t progress1bar:latest .
 ```
 
 Run the Docker container:
 ```sh
-docker container run \
---rm \
--it \
--v $PWD:/code \
-progress1bar:latest \
-/bin/bash
+docker container run --rm -it -v $PWD:/code progress1bar:latest /bin/bash
 ```
 
 Execute the build:
