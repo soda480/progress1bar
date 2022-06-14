@@ -15,7 +15,7 @@ name = 'progress1bar'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A simple ANSI-based progress bar'
 url = 'https://github.com/soda480/progress1bar'
-version = '0.1.3'
+version = '0.2.0'
 default_task = [
     'clean',
     'analyze',
@@ -37,7 +37,7 @@ def set_properties(project):
     project.set_property('flake8_include_scripts', True)
     project.set_property('flake8_include_test_sources', True)
     project.set_property('flake8_ignore', 'F401, E501')
-    project.build_depends_on_requirements('requirements-build.txt')
+    project.build_depends_on('mock')
     project.depends_on_requirements('requirements.txt')
     project.set_property('distutils_readme_description', True)
     project.set_property('distutils_description_overwrite', True)
