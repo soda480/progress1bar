@@ -22,13 +22,12 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, index=None, total=None, fill=None, regex=None, completed_message=None, aware=True, clear_alias=False):
+    def __init__(self, index=None, total=None, fill=None, regex=None, completed_message=None, clear_alias=False):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
         colorama_init()
 
-        self.aware = aware
         self.fill = ProgressBar._get_fill(fill)
 
         if not regex:
@@ -36,13 +35,16 @@ class ProgressBar(object):
         self.regex = regex
 
         self.completed_message = completed_message
+        # self._complete boolean to track if progress bar has completed
         self._complete = False
+        # self._completed int to track the number of progress bar completions
+        # it's typically just 1 but can be multiple when using .reset()
         self._completed = 0
-        self.show_completed = False
+        # include support for durations
         self.duration = None
-
         self.index = index
         self._modulus_count = 0
+        # self._reset int keeps track of the number of times the progress bar has been reset
         self._reset = 0
         self.clear_alias = clear_alias
         self.alias = ''
@@ -57,61 +59,61 @@ class ProgressBar(object):
         """ return string interpretation of class instance
         """
         bright_yellow = Style.BRIGHT + Fore.YELLOW + Back.BLACK
+
+        # determine index
         index = ''
         if self.index is not None:
             index_fill = self.fill['index']
             _index = f"{bright_yellow}{str(self.index).zfill(index_fill)}{Style.RESET_ALL}"
             index = f'{_index}: '
+
+        # determine alias
         alias = f"{bright_yellow}{self.alias}{Style.RESET_ALL}"
+
+        # determine progress
         progress = self._get_progress()
+
+        # determine completed
         completed = ''
-        if self._completed and self.show_completed:
+        if self._completed and self._reset:
             completed_fill = self.fill['completed']
             completed = f'{bright_yellow}[{str(self._completed).zfill(completed_fill)}] '
+
         return f"{index}{progress} {completed}{alias}"
 
     def __setattr__(self, name, value):
         """ set class instance attributes
         """
-        def _check(name, value):
-            """ check function
-            """
-            if name in ['total', 'count']:
-                if name == 'count':
-                    self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
-                else:
-                    if value == 0:
-                        # if total is zero then set complete
-                        self._complete = True
-                self._print(name == 'count')
-
         if name == 'count' and self.total is None:
             return
         super(ProgressBar, self).__setattr__(name, value)
-        _check(name, value)
+        if name in ['total', 'count']:
+            if name == 'count':
+                self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
+            self._print(name == 'count')
 
     def __enter__(self):
-        """ on entry - hide cursor if aware and stderr is attached to tty
+        """ on entry - hide cursor if show and stderr is attached to tty
         """
-        if self.aware and sys.stderr.isatty():
+        if sys.stderr.isatty():
             cursor.hide()
         return self
 
     def __exit__(self, *args):
-        """ on exit - show cursor if aware and stderr is attached to tty and print progress bar
+        """ on exit - show cursor if show and stderr is attached to tty and print progress bar
         """
         if self.clear_alias:
             self.alias = ''
         self._print(True)
-        if self.aware and sys.stderr.isatty():
+        if sys.stderr.isatty():
             cursor.show()
 
     def _print(self, clear):
         """ print progress bar on certain conditions
-            sys.stderr is attached to a tty and if progress bar is aware
+            sys.stderr is attached to a tty and if progress bar is show
             clear line prior to printing if clear is set or if progress bar has been reset
         """
-        if not self.aware or not sys.stderr.isatty():
+        if not sys.stderr.isatty():
             return
         if clear or self._reset:
             print(f'{Cursor.UP(1)}{CLEAR_EOL}', end='', file=sys.stderr)
@@ -126,8 +128,6 @@ class ProgressBar(object):
         self.__dict__['total'] = None
         self._complete = False
         self._modulus_count = 0
-        # reset sets show_completed - typically only want to show completed when progress bars are reused and reset
-        self.show_completed = True
         # avoid __setattr__ for setting count value
         self.__dict__['count'] = 0
         self._reset += 1
