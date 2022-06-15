@@ -22,12 +22,15 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, index=None, total=None, fill=None, regex=None, completed_message=None, clear_alias=False):
+    def __init__(self, index=None, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
         colorama_init()
-
+        # self.control boolean dictate if progress bar printing will be controlled externally via explict calls to print
+        # this is to satisfy a special use case when progress bars are used in multiple processing scenarios and is not
+        # common to set
+        self.control = control
         self.fill = ProgressBar._get_fill(fill)
 
         if not regex:
@@ -95,7 +98,7 @@ class ProgressBar(object):
     def __enter__(self):
         """ on entry - hide cursor if show and stderr is attached to tty
         """
-        if sys.stderr.isatty():
+        if not self.control and sys.stderr.isatty():
             cursor.hide()
         return self
 
@@ -105,15 +108,15 @@ class ProgressBar(object):
         if self.clear_alias:
             self.alias = ''
         self._print(True)
-        if sys.stderr.isatty():
+        if not self.control and sys.stderr.isatty():
             cursor.show()
 
     def _print(self, clear):
         """ print progress bar on certain conditions
-            sys.stderr is attached to a tty and if progress bar is show
+            sys.stderr is attached to a tty and if progress bar is not being controlled externally
             clear line prior to printing if clear is set or if progress bar has been reset
         """
-        if not sys.stderr.isatty():
+        if self.control or not sys.stderr.isatty():
             return
         if clear or self._reset:
             print(f'{Cursor.UP(1)}{CLEAR_EOL}', end='', file=sys.stderr)
