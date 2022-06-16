@@ -39,7 +39,7 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(pbar.index, 0)
         self.assertEqual(pbar.regex, {})
         self.assertIsNone(pbar.completed_message)
-        self.assertEqual(pbar._complete, False)
+        self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)
         self.assertEqual(pbar.alias, '')
@@ -56,7 +56,7 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(pbar.index, 0)
         self.assertEqual(pbar.regex, {'key', 'value'})
         self.assertIsNone(pbar.completed_message)
-        self.assertEqual(pbar._complete, False)
+        self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)
         self.assertEqual(pbar.alias, '')
@@ -115,7 +115,7 @@ class TestProgressBar(unittest.TestCase):
     def test__setattr_Should_SetExpected_When_TotalIsZero(self, *patches):
         pbar = ProgressBar(index=0)
         pbar.total = 0
-        self.assertEqual(pbar._complete, True)
+        self.assertEqual(pbar.complete, True)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -275,7 +275,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.ProgressBar._get_complete')
     def test__get_progress_Should_ReturnExpected_When_Complete(self, get_complete_patch, *patches):
         pbar = ProgressBar(index=0)
-        pbar._complete = True
+        pbar.complete = True
         result = pbar._get_progress()
         self.assertEqual(result, get_complete_patch.return_value)
 

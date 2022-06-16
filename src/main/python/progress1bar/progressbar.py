@@ -38,8 +38,8 @@ class ProgressBar(object):
         self.regex = regex
 
         self.completed_message = completed_message
-        # self._complete boolean to track if progress bar has completed
-        self._complete = False
+        # self.complete boolean to track if progress bar has completed
+        self.complete = False
         # self._completed int to track the number of progress bar completions
         # it's typically just 1 but can be multiple when using .reset()
         self._completed = 0
@@ -129,7 +129,7 @@ class ProgressBar(object):
         logger.debug('resetting progress bar')
         self.alias = ''
         self.__dict__['total'] = None
-        self._complete = False
+        self.complete = False
         self._modulus_count = 0
         # avoid __setattr__ for setting count value
         self.__dict__['count'] = 0
@@ -193,7 +193,7 @@ class ProgressBar(object):
     def _get_progress(self):
         """ return progress text
         """
-        if self._complete:
+        if self.complete:
             progress = self._get_complete()
         else:
             total_fill = self.fill['total']
@@ -201,7 +201,7 @@ class ProgressBar(object):
                 _percentage = str(round((self.count / self.total) * 100))
                 fraction = f'{str(self.count).zfill(total_fill)}/{str(self.total).zfill(total_fill)}'
                 if self.count == self.total:
-                    self._complete = True
+                    self.complete = True
                     self._completed += 1
             else:
                 _percentage = '0'
