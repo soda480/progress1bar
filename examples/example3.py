@@ -1,5 +1,8 @@
 #   -*- coding: utf-8 -*-
-import names, random, logging
+import time
+import random
+import logging
+import names
 from progress1bar import ProgressBar
 
 logger = logging.getLogger(__name__)
@@ -25,3 +28,4 @@ with ProgressBar(regex=regex, fill=fill) as pb:
     process_message(pb, f'processing total of {total}')
     for _ in range(total):
         process_message(pb, f'processed {names.get_full_name()}')
+        time.sleep(.01)

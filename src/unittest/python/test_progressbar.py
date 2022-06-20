@@ -35,8 +35,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.colorama_init')
     @patch('progress1bar.progressbar.ProgressBar._get_fill')
     def test__init_Should_SetDefaults_When_Called(self, get_fill_patch, *patches):
-        pbar = ProgressBar(index=0)
-        self.assertEqual(pbar.index, 0)
+        pbar = ProgressBar()
         self.assertEqual(pbar.regex, {})
         self.assertIsNone(pbar.completed_message)
         self.assertEqual(pbar.complete, False)
@@ -52,8 +51,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.colorama_init')
     @patch('progress1bar.progressbar.ProgressBar._get_fill')
     def test__init_Should_SetDefaults_When_AttributesPassed(self, get_fill_patch, *patches):
-        pbar = ProgressBar(index=0, total=100, regex={'key', 'value'})
-        self.assertEqual(pbar.index, 0)
+        pbar = ProgressBar(total=100, regex={'key', 'value'})
         self.assertEqual(pbar.regex, {'key', 'value'})
         self.assertIsNone(pbar.completed_message)
         self.assertEqual(pbar.complete, False)
@@ -70,9 +68,9 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.ProgressBar._get_progress')
     def test__str_Should_ReturnExpected_When_Index(self, get_progress_patch, *patches):
         get_progress_patch.return_value = 'progress'
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         result = str(pbar)
-        self.assertEqual(result, '\x1b[1m\x1b[33m\x1b[40m00\x1b[0m: progress \x1b[1m\x1b[33m\x1b[40m\x1b[0m')
+        self.assertEqual(result, 'progress \x1b[1m\x1b[33m\x1b[40m\x1b[0m')
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -88,7 +86,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.ProgressBar._get_progress')
     def test__str_Should_ReturnExpected_When_ShowCompleted(self, get_progress_patch, *patches):
         get_progress_patch.return_value = 'Processing complete'
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar._completed = 12
         pbar._reset = 2
         str(pbar)
@@ -97,7 +95,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__setattr_Should_SetExpected_When_CountAndTotal(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.total = 100
         pbar.count = 10
         self.assertEqual(pbar._modulus_count, 5)
@@ -105,7 +103,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__setattr_Should_SetExpected_When_TotalIsNone(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.count = 10
         self.assertEqual(pbar._modulus_count, 0)
 
@@ -113,7 +111,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__setattr_Should_SetExpected_When_TotalIsZero(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.total = 0
         self.assertEqual(pbar.complete, True)
 
@@ -123,7 +121,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.ProgressBar._match_alias', return_value=False)
     @patch('progress1bar.progressbar.ProgressBar._match_total', return_value=False)
     def test__match_Should_CallExpected_When_Called(self, match_total_patch, match_alias_patch, match_count_patch, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         text = '--some-text--'
         pbar.match(text)
         match_total_patch.assert_called_once_with(text)
@@ -136,7 +134,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.ProgressBar._match_alias', return_value=False)
     @patch('progress1bar.progressbar.ProgressBar._match_total', return_value=False)
     def test__match_Should_CallExpected_When_CalledNoMatch(self, match_total_patch, match_alias_patch, match_count_patch, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         text = '--some-text--'
         pbar.match(text)
         match_total_patch.assert_called_once_with(text)
@@ -146,7 +144,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_total_Should_ReturnMatchAndSetExpected_When_TotalIsNoneAndMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'total': r'^total is: (?P<value>\d+)$'})
+        pbar = ProgressBar(regex={'total': r'^total is: (?P<value>\d+)$'})
         text = 'total is: 100'
         result = pbar._match_total(text)
         self.assertEqual(pbar.total, 100)
@@ -155,7 +153,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_total_Should_ReturnNone_When_TotalIsSet(self, *patches):
-        pbar = ProgressBar(index=0, regex={'total': r'^total is: (?P<value>\d+)$'})
+        pbar = ProgressBar(regex={'total': r'^total is: (?P<value>\d+)$'})
         text = 'total is: 100'
         pbar.total = 50
         result = pbar._match_total(text)
@@ -164,7 +162,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_total_Should_ReturnNone_When_TotalIsNoneAndNoRegex(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         text = 'total is: 100'
         result = pbar._match_total(text)
         self.assertIsNone(result)
@@ -172,7 +170,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_total_Should_ReturnNone_When_TotalIsNoneAndNoMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'total': r'^total is: (?P<value>\d+)$'})
+        pbar = ProgressBar(regex={'total': r'^total is: (?P<value>\d+)$'})
         text = 'count is: 100'
         result = pbar._match_total(text)
         self.assertIsNone(result)
@@ -180,7 +178,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_alias_Should_ReturnMatchAndSetExpected_When_RegexMatchGreaterThanWidth(self, *patches):
-        pbar = ProgressBar(index=0, regex={'alias': r'^id is: (?P<value>.*)$'})
+        pbar = ProgressBar(regex={'alias': r'^id is: (?P<value>.*)$'})
         long_id = 'a' * (ALIAS_WIDTH + 10)
         text = f'id is: {long_id}'
         result = pbar._match_alias(text)
@@ -190,7 +188,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_alias_Should_ReturnMatchAndSetExpected_When_RegexMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'alias': r'^id is: (?P<value>.*)$'})
+        pbar = ProgressBar(regex={'alias': r'^id is: (?P<value>.*)$'})
         text = 'id is: abc123'
         result = pbar._match_alias(text)
         self.assertEqual(pbar.alias, 'abc123')
@@ -199,7 +197,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_alias_Should_ReturnNone_When_NoRegex(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         text = 'id is: abc'
         result = pbar._match_alias(text)
         self.assertIsNone(result)
@@ -207,7 +205,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_alias_Should_ReturnNone_When_NoRegexMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'alias': r'^id is: (?P<value>.*)$'})
+        pbar = ProgressBar(regex={'alias': r'^id is: (?P<value>.*)$'})
         text = 'total is: 100'
         result = pbar._match_alias(text)
         self.assertIsNone(result)
@@ -215,7 +213,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_count_ShouldReturnMatchAndSetExpected_When_RegexMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'count': r'processed item'})
+        pbar = ProgressBar(regex={'count': r'processed item'})
         pbar.total = 100
         text = 'processed item'
         result = pbar._match_count(text)
@@ -225,7 +223,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_count_ShouldReturnNone_When_NoRegex(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.total = 100
         text = 'processed item'
         result = pbar._match_count(text)
@@ -235,7 +233,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__match_count_ShouldReturnNone_When_NoRegexMatch(self, *patches):
-        pbar = ProgressBar(index=0, regex={'count': r'processed widget'})
+        pbar = ProgressBar(regex={'count': r'processed widget'})
         pbar.total = 100
         pbar.count = 10
         text = 'processed item'
@@ -246,7 +244,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_complete_Should_ReturnExpected_When_MessageAndDuration(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.completed_message = 'All done'
         pbar.duration = '01:23:45'
         result = pbar._get_complete()
@@ -256,7 +254,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_complete_Should_ReturnExpected_When_NoMessageAndDuration(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.duration = '01:23:45'
         result = pbar._get_complete()
         expected_result = 'Processing complete - 01:23:45'
@@ -265,7 +263,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_complete_Should_ReturnExpected_When_NoMessageAndNoDuration(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         result = pbar._get_complete()
         expected_result = 'Processing complete'
         self.assertEqual(result, expected_result)
@@ -274,7 +272,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.colorama_init')
     @patch('progress1bar.progressbar.ProgressBar._get_complete')
     def test__get_progress_Should_ReturnExpected_When_Complete(self, get_complete_patch, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.complete = True
         result = pbar._get_progress()
         self.assertEqual(result, get_complete_patch.return_value)
@@ -282,14 +280,14 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_progress_Should_ReturnExpected_When_NotCompleteNoTotal(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         result = pbar._get_progress()
         self.assertTrue('##/##' in result)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_progress_Should_ReturnExpected_When_NotCompleteAndTotal(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.total = 100
         pbar.count = 50
         result = pbar._get_progress()
@@ -298,7 +296,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_progress_Should_ReturnExpected_When_NotCompleteAndCountIsTotal(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.total = 100
         pbar.count = 100
         result = pbar._get_progress()
@@ -307,19 +305,19 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__reset_Should_SetExpected_When_Called(self, *patches):
-        pbar = ProgressBar(index=0)
+        pbar = ProgressBar()
         pbar.reset()
         pbar.reset()
         self.assertEqual(pbar._reset, 2)
 
     def test__get_fill_Should_ReturnExpected_When_NoData(self, *patches):
         result = ProgressBar._get_fill(None)
-        expected_result = {'total': FILL, 'index': FILL, 'completed': FILL}
+        expected_result = {'total': FILL, 'completed': FILL}
         self.assertEqual(result, expected_result)
 
     def test__get_fill_Should_ReturnExpected_When_Data(self, *patches):
-        result = ProgressBar._get_fill({'max_index': 203, 'max_total': 10000, 'max_completed': 12})
-        expected_result = {'total': 5, 'index': 3, 'completed': 2}
+        result = ProgressBar._get_fill({'max_total': 10000, 'max_completed': 12})
+        expected_result = {'total': 5, 'completed': 2}
         self.assertEqual(result, expected_result)
 
     @patch('progress1bar.progressbar.cursor')
