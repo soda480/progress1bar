@@ -22,7 +22,7 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, index=None, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False):
+    def __init__(self, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
@@ -45,7 +45,6 @@ class ProgressBar(object):
         self._completed = 0
         # include support for durations
         self.duration = None
-        self.index = index
         self._modulus_count = 0
         # self._reset int keeps track of the number of times the progress bar has been reset
         self._reset = 0
@@ -63,13 +62,6 @@ class ProgressBar(object):
         """
         bright_yellow = Style.BRIGHT + Fore.YELLOW + Back.BLACK
 
-        # determine index
-        index = ''
-        if self.index is not None:
-            index_fill = self.fill['index']
-            _index = f"{bright_yellow}{str(self.index).zfill(index_fill)}{Style.RESET_ALL}"
-            index = f'{_index}: '
-
         # determine alias
         alias = f"{bright_yellow}{self.alias}{Style.RESET_ALL}"
 
@@ -82,7 +74,7 @@ class ProgressBar(object):
             completed_fill = self.fill['completed']
             completed = f'{bright_yellow}[{str(self._completed).zfill(completed_fill)}] '
 
-        return f"{index}{progress} {completed}{alias}"
+        return f"{progress} {completed}{alias}"
 
     def __setattr__(self, name, value):
         """ set class instance attributes
@@ -140,8 +132,9 @@ class ProgressBar(object):
         """
         functions = [self._match_total, self._match_alias, self._match_count]
         for function in functions:
-            if function(text):
-                break
+            match = function(text)
+            if match:
+                return match
 
     def _match_total(self, text):
         """ set total if text matches total regex
@@ -220,10 +213,8 @@ class ProgressBar(object):
         fill = {}
         if not data:
             fill['total'] = FILL
-            fill['index'] = FILL
             fill['completed'] = FILL
         else:
             fill['total'] = len(str(data.get('max_total', FILL * '-')))
-            fill['index'] = len(str(data.get('max_index', FILL * '-')))
             fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
         return fill

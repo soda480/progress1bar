@@ -1,5 +1,7 @@
 #   -*- coding: utf-8 -*-
-import names, random, time
+import time
+import random
+import names
 from progress1bar import ProgressBar
 
 with ProgressBar() as pb:
