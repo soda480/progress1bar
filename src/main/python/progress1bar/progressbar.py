@@ -140,8 +140,9 @@ class ProgressBar(object):
         """
         functions = [self._match_total, self._match_alias, self._match_count]
         for function in functions:
-            if function(text):
-                break
+            match = function(text)
+            if match:
+                return match
 
     def _match_total(self, text):
         """ set total if text matches total regex
