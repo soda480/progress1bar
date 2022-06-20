@@ -9,53 +9,103 @@
 
 A simple ANSI-based progress bar.
 
-## Installation ##
+## Installation
 ```bash
 pip install progress1bar
 ```
 
 ### `ProgressBar`
 
-The `ProgressBar` class is used to display function execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
-```python
-import names, random, time
-from progress1bar import ProgressBar
-
-with ProgressBar() as pb:
-    pb.alias = names.get_full_name()
-    pb.total = random.randint(50, 100)
-    for _ in range(pb.total):
-        # simulate work
-        pb.count += 1
-        time.sleep(.09)
 ```
-Executing the code above ([example1](https://github.com/soda480/progress1bar/tree/master/examples/example1.py)) results in the following:
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
+ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False)
+```
 
-## Examples ##
+<details><summary>Documentation</summary>
+
+> `total` - An integer for the total number of items the progress bar will show that need to be completed.
+
+> `fill` - A dictionary whose key values are integers that dictate the number of leading zeros the progress bar should add to the `total` and `completed` values; this is optional and should be used to format the progress bar appearance. The supported key values are `max_total` and `max_completed`.
+
+> `regex` - A dictionary whose key values are regular expressions for `total`, `count` and `alias`. The regular expressions will be checked against the log messages intercepted from the executing function, if matched the value will be used to assign the attribute for the respective progress bar. The `total` and `count` key values are required, the `alias` key value is optional.
+
+> `completed_message` - A string to designate the message the progress bar should display when complete. Default is 'Processing complete'
+
+> `clear_alias` - A boolean to designate if the progress bar should clear the alias when complete.
+
+**Attributes**
+
+> `count` - An integer attribute to increment that designates the current count. When count reaches total the progress bar will show complete.
+
+> `alias` - A string attribute to set the alias of the progress bar.
+
+**Functions**
+
+> **reset()**
+>> Reset the progress bar so that it can be used again. It will maintain and show the number of times the progress bar has been used.
+
+</details>
+
+
+### Examples
 
 Various [examples](https://github.com/soda480/progress1bar/tree/master/examples) are included to demonstrate the progress1bar package. To run the examples, build the Docker image and run the Docker container using the instructions described in the [Development](#development) section.
 
+#### [example1](https://github.com/soda480/progress1bar/tree/master/examples/example1.py)
+
+The `ProgressBar` class is used to display function execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
+
+<details><summary>Code</summary>
+
+```Python
+import time
+from progress1bar import ProgressBar
+
+with ProgressBar(total=250) as pb:
+    for _ in range(pb.total):
+        pb.count += 1
+        # simulate work
+        time.sleep(.01)
+```
+
+</details>
+
+![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
+
+#### [example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)
+
 Configure `ProgressBar` to display the item that is currently being processd by setting the `alias` attribute, specify fill dictionary parameter to ensure the progress bar digits are displayed uniformly:
-```python
+
+<details><summary>Code</summary>
+
+```Python
 import names
 from progress1bar import ProgressBar
 
 print('Processing names...')
 completed_message = 'Done processing all names'
-fill = {'max_index': 9, 'max_total': 999}
-with ProgressBar(index=1, total=500, completed_message=completed_message, fill=fill, clear_alias=True) as pb:
+fill = {'max_total': 999}
+with ProgressBar(total=500, completed_message=completed_message, fill=fill, clear_alias=True) as pb:
     for _ in range(pb.total):
         pb.alias = names.get_full_name()
         # simulate work
         pb.count += 1
 ```
-Executing the code above ([example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)) results in the following:
+
+</details>
+
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
 
+#### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
+
 Configure `ProgressBar` to use regular expressions to determine the `total`, `count` and `alias` attributes:
-```python
-import names, random, logging
+
+<details><summary>Code</summary>
+
+```Python
+import time
+import random
+import logging
+import names
 from progress1bar import ProgressBar
 
 logger = logging.getLogger(__name__)
@@ -81,22 +131,33 @@ with ProgressBar(regex=regex, fill=fill) as pb:
     process_message(pb, f'processing total of {total}')
     for _ in range(total):
         process_message(pb, f'processed {names.get_full_name()}')
+        time.sleep(.01)
 ```
-Executing the code above ([example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)) results in the following:
+
+</details>
+
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example3.gif)
 
+#### [example4](https://github.com/soda480/progress1bar/tree/master/examples/example4.py)
+
 Configure `ProgressBar` to show and reuse progress for several iterations:
-```python
-import names, random
+
+<details><summary>Code</summary>
+
+```Python
+import time
+import random
+import names
 from progress1bar import ProgressBar
 
-TOTAL_ITEMS = 325
-TOTAL_NAMES = 5
+TOTAL_ITEMS = 150
+TOTAL_NAMES = 7
 
 fill = {
     'max_total': TOTAL_ITEMS,
     'max_completed': TOTAL_NAMES
 }
+print(f'This progress bar will execute {TOTAL_NAMES} iterations of varying counts and keep track of how many have been completed ...')
 with ProgressBar(fill=fill) as pb:
     total_names = 0
     while True:
@@ -105,13 +166,16 @@ with ProgressBar(fill=fill) as pb:
         for _ in range(pb.total):
             names.get_full_name()
             pb.count += 1
+            time.sleep(.01)
         total_names += 1  
         if total_names == TOTAL_NAMES:
             pb.alias = ''
             break
         pb.reset()
 ```
-Executing the code above ([example4](https://github.com/soda480/progress1bar/tree/master/examples/example4.py)) results in the following:
+
+</details>
+
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example4.gif)
 
 ## Development ##
