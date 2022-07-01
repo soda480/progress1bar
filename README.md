@@ -196,7 +196,7 @@ docker container run \
 -it \
 -v $PWD:/code \
 progress1bar:latest \
-/bin/bash
+bash
 ```
 
 Execute the build:

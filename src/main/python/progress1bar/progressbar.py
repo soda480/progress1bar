@@ -12,6 +12,8 @@ from colorama import init as colorama_init
 logger = logging.getLogger(__name__)
 
 TICKER = chr(9632)  # ■
+TICKER = chr(9644)  # ▬
+TICKER = chr(9473)
 PROGRESS_WIDTH = 50
 ALIAS_WIDTH = 100
 FILL = 2
@@ -203,7 +205,7 @@ class ProgressBar(object):
             bar = TICKER * self._modulus_count
             padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
             percentage = _percentage.rjust(3)
-            progress = f"Processing |{bar}{padding}| {Style.BRIGHT}{percentage}%{Style.RESET_ALL} {fraction}"
+            progress = f"Processing |{bar}{padding}|{Style.BRIGHT}{percentage}%{Style.RESET_ALL} {fraction}"
         return progress
 
     @staticmethod
