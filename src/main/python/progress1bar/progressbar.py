@@ -12,8 +12,8 @@ from colorama import init as colorama_init
 logger = logging.getLogger(__name__)
 
 TICKER = chr(9632)  # ■
-TICKER = chr(9644)  # ▬
-TICKER = chr(9473)
+TICKER = chr(9644) 
+# TICKER = chr(9473)  # ━
 PROGRESS_WIDTH = 50
 ALIAS_WIDTH = 100
 FILL = 2
@@ -24,7 +24,7 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False):
+    def __init__(self, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False, show_prefix=True, show_fraction=True, show_percentage=True):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
@@ -33,8 +33,6 @@ class ProgressBar(object):
         # this is to satisfy a special use case when progress bars are used in multiple processing scenarios and is not
         # common to set
         self.control = control
-        self.fill = ProgressBar._get_fill(fill)
-
         if not regex:
             regex = {}
         self.regex = regex
@@ -55,6 +53,11 @@ class ProgressBar(object):
         # avoid __setattr__
         self.__dict__['count'] = 0
         self.__dict__['total'] = total
+        # set fill after total is set
+        self._set_fill(fill)
+        self.show_prefix = show_prefix
+        self.show_fraction = show_fraction
+        self.show_percentage = show_percentage
         if total:
             # print progress bar if total specified in constructor
             self._print(False)
@@ -65,18 +68,18 @@ class ProgressBar(object):
         bright_yellow = Style.BRIGHT + Fore.YELLOW + Back.BLACK
 
         # determine alias
-        alias = f"{bright_yellow}{self.alias}{Style.RESET_ALL}"
+        alias = f" {bright_yellow}{self.alias}{Style.RESET_ALL}"
 
         # determine progress
-        progress = self._get_progress()
+        progress = self._get_progress().strip()
 
         # determine completed
         completed = ''
         if self._completed and self._reset:
-            completed_fill = self.fill['completed']
-            completed = f'{bright_yellow}[{str(self._completed).zfill(completed_fill)}] '
+            completed_fill = self._fill['completed']
+            completed = f' {bright_yellow}[{str(self._completed).zfill(completed_fill)}]'
 
-        return f"{progress} {completed}{alias}"
+        return f"{progress}{completed}{alias}"
 
     def __setattr__(self, name, value):
         """ set class instance attributes
@@ -87,6 +90,10 @@ class ProgressBar(object):
         if name in ['total', 'count']:
             if name == 'count':
                 self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
+            else:
+                if not self._fill['total']:
+                    # only set fill for total if is is not set
+                    self._fill['total'] = len(str(value))
             self._print(name == 'count')
 
     def __enter__(self):
@@ -185,38 +192,53 @@ class ProgressBar(object):
             progress = f'{progress} - {self.duration}'
         return progress
 
+    def _get_percent_fraction(self):
+        """ return tuple consisting of percentage and fraction for instance of non-completed progress bar
+        """
+        if self.total:
+            total_fill = self._fill['total']
+            percentage = str(round((self.count / self.total) * 100)).rjust(3)
+            fraction = f'{str(self.count).zfill(total_fill)}/{str(self.total).zfill(total_fill)}'
+            if self.count == self.total:
+                self.complete = True
+                self._completed += 1
+        else:
+            percentage = '0'.rjust(3)
+            fraction = '#' * FILL + '/' + '#' * FILL
+        return percentage, fraction
+
     def _get_progress(self):
         """ return progress text
         """
         if self.complete:
             progress = self._get_complete()
         else:
-            total_fill = self.fill['total']
-            if self.total:
-                _percentage = str(round((self.count / self.total) * 100))
-                fraction = f'{str(self.count).zfill(total_fill)}/{str(self.total).zfill(total_fill)}'
-                if self.count == self.total:
-                    self.complete = True
-                    self._completed += 1
-            else:
-                _percentage = '0'
-                fraction = '#' * total_fill + '/' + '#' * total_fill
-
+            _percentage, _fraction = self._get_percent_fraction()
+            prefix = ''
+            if self.show_prefix:
+                prefix = 'Processing '
+            fraction = ''
+            if self.show_fraction:
+                fraction = _fraction
+            percentage = ''
+            if self.show_percentage:
+                percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
             bar = TICKER * self._modulus_count
             padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
-            percentage = _percentage.rjust(3)
-            progress = f"Processing |{bar}{padding}|{Style.BRIGHT}{percentage}%{Style.RESET_ALL} {fraction}"
+            progress = f"{prefix}|{bar}{padding}|{percentage}{fraction}"
         return progress
 
-    @staticmethod
-    def _get_fill(data):
+    def _set_fill(self, data):
         """ return fill dictionary derived from data values
         """
-        fill = {}
+        self._fill = {
+            'total': None,
+            'completed': None
+        }
         if not data:
-            fill['total'] = FILL
-            fill['completed'] = FILL
+            self._fill['completed'] = FILL
         else:
-            fill['total'] = len(str(data.get('max_total', FILL * '-')))
-            fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
-        return fill
+            self._fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
+            self._fill['total'] = len(str(data.get('max_total', FILL * '-')))
+        if self.total and not self._fill['total']:
+            self._fill['total'] = len(str(self.total))

@@ -7,12 +7,8 @@ from progress1bar import ProgressBar
 TOTAL_ITEMS = 800
 ITERATIONS = 4
 
-fill = {
-    'max_total': TOTAL_ITEMS,
-    'max_completed': ITERATIONS
-}
-print(f'This progress bar will execute {ITERATIONS} iterations of varying totals:')
-with ProgressBar(fill=fill) as pb:
+print(f'Execute {ITERATIONS} iterations of varying totals:')
+with ProgressBar(show_prefix=False, show_fraction=False) as pb:
     iterations = 0
     while True:
         if iterations == ITERATIONS:
