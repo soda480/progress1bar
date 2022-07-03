@@ -12,7 +12,7 @@ from colorama import init as colorama_init
 logger = logging.getLogger(__name__)
 
 TICKER = chr(9632)  # ■
-TICKER = chr(9644) 
+TICKER = chr(9644)
 # TICKER = chr(9473)  # ━
 PROGRESS_WIDTH = 50
 ALIAS_WIDTH = 100
@@ -24,7 +24,7 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False, show_prefix=True, show_fraction=True, show_percentage=True):
+    def __init__(self, ticker=9632, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False, show_prefix=True, show_fraction=True, show_percentage=True):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
@@ -32,6 +32,7 @@ class ProgressBar(object):
         # self.control boolean dictate if progress bar printing will be controlled externally via explict calls to print
         # this is to satisfy a special use case when progress bars are used in multiple processing scenarios and is not
         # common to set
+        self.ticker = chr(ticker)
         self.control = control
         if not regex:
             regex = {}
@@ -223,7 +224,7 @@ class ProgressBar(object):
             percentage = ''
             if self.show_percentage:
                 percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
-            bar = TICKER * self._modulus_count
+            bar = self.ticker * self._modulus_count
             padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
             progress = f"{prefix}|{bar}{padding}|{percentage}{fraction}"
         return progress
