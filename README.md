@@ -16,7 +16,7 @@ pip install progress1bar
 ### `ProgressBar`
 
 ```
-ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False, show_prefix=True, show_fraction=True, show_percentage=True)
+ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False, show_prefix=True, show_fraction=True, show_percentage=True, ticker=None)
 ```
 
 <details><summary>Documentation</summary>
@@ -36,6 +36,8 @@ ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_ali
 > `show_fraction` - A boolean to designate if the fraction should be printed with the progress bar.
 
 > `show_percentage` - A boolean to designate if the percentage should be printed with the progress bar.
+
+> `ticker` - A integer representing unicode character to print as the progress bar ticker. Refer to [unicode chart](https://www.ssec.wisc.edu/~tomw/java/unicode.html) for values. Default is 9632 (black square ■).
 
 **Attributes**
 
@@ -103,7 +105,7 @@ with ProgressBar(total=75, completed_message=completed_message, clear_alias=True
 
 #### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
 
-Configure `ProgressBar` to use regular expressions to determine the `total`, `count` and `alias` attributes:
+Configure `ProgressBar` with a non-default ticker, and use regular expressions to determine the `total`, `count` and `alias` attributes:
 
 <details><summary>Code</summary>
 
@@ -117,7 +119,7 @@ regex = {
     'count': r'^processed .*$',
     'alias': r'^processor is (?P<value>.*)$'
 }
-with ProgressBar(regex=regex) as pb:
+with ProgressBar(ticker=9473, regex=regex) as pb:
     pb.match(f'processor is {names.get_full_name()}')
     total = random.randint(500, 1000)
     pb.match(f'processing total of {total}')

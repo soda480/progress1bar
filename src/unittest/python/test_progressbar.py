@@ -14,13 +14,19 @@ class TestProgressBar(unittest.TestCase):
         """
         return ''.join(char for char in item if char not in string.printable)
 
+    def test__init_Should_RaiseValueError_When_TickerNotInRange(self, *patches):
+        with self.assertRaises(ValueError):
+            ProgressBar(ticker=32)
+        with self.assertRaises(ValueError):
+            ProgressBar(ticker=65534)
+
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
-    @patch('progress1bar.progressbar.ProgressBar._set_fill')
-    def test__init_Should_SetDefaults_When_Called(self, *patches):
+    @patch('progress1bar.progressbar.ProgressBar._get_fill')
+    def test__init_Should_SetDefaults_When_Called(self, get_fill_patch, *patches):
         pbar = ProgressBar()
         self.assertEqual(pbar.regex, {})
-        self.assertIsNone(pbar.completed_message)
+        self.assertEqual(pbar.completed_message, 'Processing complete')
         self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)
@@ -28,13 +34,14 @@ class TestProgressBar(unittest.TestCase):
         self.assertIsNone(pbar.total)
         self.assertEqual(pbar._modulus_count, 0)
         self.assertEqual(pbar._reset, 0)
+        self.assertEqual(pbar._fill, get_fill_patch.return_value)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__init_Should_SetDefaults_When_AttributesPassed(self, *patches):
-        pbar = ProgressBar(total=100, regex={'key', 'value'})
+        pbar = ProgressBar(total=100, regex={'key', 'value'}, completed_message='--completed-message--')
         self.assertEqual(pbar.regex, {'key', 'value'})
-        self.assertIsNone(pbar.completed_message)
+        self.assertEqual(pbar.completed_message, '--completed-message--')
         self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)

@@ -11,9 +11,6 @@ from colorama import init as colorama_init
 
 logger = logging.getLogger(__name__)
 
-TICKER = chr(9632)  # ■
-TICKER = chr(9644)
-# TICKER = chr(9473)  # ━
 PROGRESS_WIDTH = 50
 ALIAS_WIDTH = 100
 FILL = 2
@@ -24,21 +21,26 @@ class ProgressBar(object):
     """ Progress Bar implementation
     """
 
-    def __init__(self, ticker=9632, total=None, fill=None, regex=None, completed_message=None, clear_alias=False, control=False, show_prefix=True, show_fraction=True, show_percentage=True):
+    def __init__(self, **kwargs):
         """ class constructor
         """
         logger.debug('executing ProgressBar constructor')
         colorama_init()
-        # self.control boolean dictate if progress bar printing will be controlled externally via explict calls to print
-        # this is to satisfy a special use case when progress bars are used in multiple processing scenarios and is not
-        # common to set
-        self.ticker = chr(ticker)
-        self.control = control
-        if not regex:
-            regex = {}
-        self.regex = regex
-
-        self.completed_message = completed_message
+        defaults = {
+            'regex': {},
+            'completed_message': 'Processing complete',
+            'clear_alias': False,
+            'control': False,
+            'show_prefix': True,
+            'show_fraction': True,
+            'show_percentage': True
+        }
+        for (attribute, default) in defaults.items():
+            setattr(self, attribute, kwargs.get(attribute, default))
+        ticker = kwargs.get('ticker', 9632)
+        if not (32 < ticker < 65533):
+            raise ValueError('ticker value not in supported range')
+        self._ticker = chr(ticker)
         # self.complete boolean to track if progress bar has completed
         self.complete = False
         # self._completed int to track the number of progress bar completions
@@ -49,16 +51,13 @@ class ProgressBar(object):
         self._modulus_count = 0
         # self._reset int keeps track of the number of times the progress bar has been reset
         self._reset = 0
-        self.clear_alias = clear_alias
         self.alias = ''
         # avoid __setattr__
         self.__dict__['count'] = 0
+        total = kwargs.get('total')
         self.__dict__['total'] = total
-        # set fill after total is set
-        self._set_fill(fill)
-        self.show_prefix = show_prefix
-        self.show_fraction = show_fraction
-        self.show_percentage = show_percentage
+        # execute after total is set
+        self._fill = self._get_fill(kwargs.get('fill', {}))
         if total:
             # print progress bar if total specified in constructor
             self._print(False)
@@ -224,22 +223,23 @@ class ProgressBar(object):
             percentage = ''
             if self.show_percentage:
                 percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
-            bar = self.ticker * self._modulus_count
+            bar = self._ticker * self._modulus_count
             padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
             progress = f"{prefix}|{bar}{padding}|{percentage}{fraction}"
         return progress
 
-    def _set_fill(self, data):
+    def _get_fill(self, data):
         """ return fill dictionary derived from data values
         """
-        self._fill = {
+        fill = {
             'total': None,
             'completed': None
         }
         if not data:
-            self._fill['completed'] = FILL
+            fill['completed'] = FILL
         else:
-            self._fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
-            self._fill['total'] = len(str(data.get('max_total', FILL * '-')))
-        if self.total and not self._fill['total']:
-            self._fill['total'] = len(str(self.total))
+            fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
+            fill['total'] = len(str(data.get('max_total', FILL * '-')))
+        if self.total and not fill['total']:
+            fill['total'] = len(str(self.total))
+        return fill

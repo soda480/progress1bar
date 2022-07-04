@@ -8,7 +8,7 @@ regex = {
     'count': r'^processed .*$',
     'alias': r'^processor is (?P<value>.*)$'
 }
-with ProgressBar(regex=regex) as pb:
+with ProgressBar(ticker=9644, regex=regex) as pb:
     pb.match(f'processor is {names.get_full_name()}')
     total = random.randint(500, 1000)
     pb.match(f'processing total of {total}')
