@@ -1,17 +1,10 @@
 import string
 import unittest
 from mock import patch
-from mock import call
 from mock import Mock
-from mock import MagicMock
-
 from progress1bar import ProgressBar
 from progress1bar.progressbar import FILL
 from progress1bar.progressbar import ALIAS_WIDTH
-
-import sys
-import logging
-logger = logging.getLogger(__name__)
 
 
 class TestProgressBar(unittest.TestCase):
@@ -21,15 +14,11 @@ class TestProgressBar(unittest.TestCase):
         """
         return ''.join(char for char in item if char not in string.printable)
 
-    def setUp(self):
-        """
-        """
-        pass
-
-    def tearDown(self):
-        """
-        """
-        pass
+    def test__init_Should_RaiseValueError_When_TickerNotInRange(self, *patches):
+        with self.assertRaises(ValueError):
+            ProgressBar(ticker=32)
+        with self.assertRaises(ValueError):
+            ProgressBar(ticker=65534)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -37,7 +26,7 @@ class TestProgressBar(unittest.TestCase):
     def test__init_Should_SetDefaults_When_Called(self, get_fill_patch, *patches):
         pbar = ProgressBar()
         self.assertEqual(pbar.regex, {})
-        self.assertIsNone(pbar.completed_message)
+        self.assertEqual(pbar.completed_message, 'Processing complete')
         self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)
@@ -45,15 +34,14 @@ class TestProgressBar(unittest.TestCase):
         self.assertIsNone(pbar.total)
         self.assertEqual(pbar._modulus_count, 0)
         self.assertEqual(pbar._reset, 0)
-        self.assertEqual(pbar.fill, get_fill_patch.return_value)
+        self.assertEqual(pbar._fill, get_fill_patch.return_value)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
-    @patch('progress1bar.progressbar.ProgressBar._get_fill')
-    def test__init_Should_SetDefaults_When_AttributesPassed(self, get_fill_patch, *patches):
-        pbar = ProgressBar(total=100, regex={'key', 'value'})
+    def test__init_Should_SetDefaults_When_AttributesPassed(self, *patches):
+        pbar = ProgressBar(total=100, regex={'key', 'value'}, completed_message='--completed-message--')
         self.assertEqual(pbar.regex, {'key', 'value'})
-        self.assertIsNone(pbar.completed_message)
+        self.assertEqual(pbar.completed_message, '--completed-message--')
         self.assertEqual(pbar.complete, False)
         self.assertEqual(pbar._completed, 0)
         self.assertIsNone(pbar.duration)
@@ -61,7 +49,6 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(pbar.total, 100)
         self.assertEqual(pbar._modulus_count, 0)
         self.assertEqual(pbar._reset, 0)
-        self.assertEqual(pbar.fill, get_fill_patch.return_value)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -310,21 +297,21 @@ class TestProgressBar(unittest.TestCase):
         pbar.reset()
         self.assertEqual(pbar._reset, 2)
 
-    def test__get_fill_Should_ReturnExpected_When_NoData(self, *patches):
-        result = ProgressBar._get_fill(None)
-        expected_result = {'total': FILL, 'completed': FILL}
-        self.assertEqual(result, expected_result)
+    def test__set_fill_Should_ReturnExpected_When_NoData(self, *patches):
+        pbar = ProgressBar()
+        expected_result = {'total': None, 'completed': FILL}
+        self.assertEqual(pbar._fill, expected_result)
 
-    def test__get_fill_Should_ReturnExpected_When_Data(self, *patches):
-        result = ProgressBar._get_fill({'max_total': 10000, 'max_completed': 12})
+    def test__set_fill_Should_ReturnExpected_When_Data(self, *patches):
+        pbar = ProgressBar(fill={'max_total': 10000, 'max_completed': 12})
         expected_result = {'total': 5, 'completed': 2}
-        self.assertEqual(result, expected_result)
+        self.assertEqual(pbar._fill, expected_result)
 
     @patch('progress1bar.progressbar.cursor')
     @patch('progress1bar.progressbar.sys.stderr')
     def test__enter_exit_Should_HideAndShowCursor_When_Tty(self, stderr_patch, cursor_patch, *patches):
         stderr_patch.isatty.return_value = True
-        with ProgressBar():
+        with ProgressBar(total=10):
             cursor_patch.hide.assert_called_once_with()
         cursor_patch.show.assert_called_once_with()
 
