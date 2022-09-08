@@ -82,7 +82,7 @@ with ProgressBar(total=250, show_prefix=False, show_fraction=True) as pb:
 
 #### [example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)
 
-Configure `ProgressBar` to display the item that is currently being processd by setting the `alias` attribute, specify fill dictionary parameter to ensure the progress bar digits are displayed uniformly:
+Configure `ProgressBar` to display an alias for the item that is currently being processd by setting the `alias` parameter, specify fill dictionary parameter to ensure the progress bar digits are displayed uniformly:
 
 <details><summary>Code</summary>
 
@@ -107,7 +107,7 @@ with ProgressBar(total=75, completed_message=completed_message, clear_alias=True
 
 #### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
 
-Configure `ProgressBar` with a non-default ticker, and use regular expressions to determine the `total`, `count` and `alias` attributes:
+Configure `ProgressBar` with a non-default ticker, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
 
 <details><summary>Code</summary>
 
