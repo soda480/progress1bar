@@ -57,7 +57,7 @@ class TestProgressBar(unittest.TestCase):
         get_progress_patch.return_value = 'progress'
         pbar = ProgressBar()
         result = str(pbar)
-        self.assertEqual(result, 'progress \x1b[1m\x1b[33m\x1b[40m\x1b[0m')
+        self.assertEqual(result, 'progress \x1b[1m\x1b[33m\x1b[0m')
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -66,7 +66,7 @@ class TestProgressBar(unittest.TestCase):
         get_progress_patch.return_value = 'progress'
         pbar = ProgressBar()
         result = str(pbar)
-        self.assertEqual(result, 'progress \x1b[1m\x1b[33m\x1b[40m\x1b[0m')
+        self.assertEqual(result, 'progress \x1b[1m\x1b[33m\x1b[0m')
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
