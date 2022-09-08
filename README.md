@@ -16,7 +16,7 @@ pip install progress1bar
 ### `ProgressBar`
 
 ```
-ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False, show_prefix=True, show_fraction=True, show_percentage=True, ticker=None)
+ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False, show_prefix=True, show_fraction=True, show_percentage=True, ticker=None, use_color=True)
 ```
 
 <details><summary>Documentation</summary>
@@ -38,6 +38,8 @@ ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_ali
 > `show_percentage` - A boolean to designate if the percentage should be printed with the progress bar.
 
 > `ticker` - A integer representing unicode character to print as the progress bar ticker. Refer to [unicode chart](https://www.ssec.wisc.edu/~tomw/java/unicode.html) for values. Default is 9632 (black square ■).
+
+> `use_color` - A boolean to designate if the progress bar should be displayed with color. Default is `True`.
 
 **Attributes**
 
@@ -119,7 +121,7 @@ regex = {
     'count': r'^processed .*$',
     'alias': r'^processor is (?P<value>.*)$'
 }
-with ProgressBar(ticker=9473, regex=regex) as pb:
+with ProgressBar(ticker=10148, regex=regex, use_color=False) as pb:
     pb.match(f'processor is {names.get_full_name()}')
     total = random.randint(500, 1000)
     pb.match(f'processing total of {total}')

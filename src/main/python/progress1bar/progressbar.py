@@ -5,7 +5,6 @@ import logging
 import cursor
 from colorama import Style
 from colorama import Fore
-from colorama import Back
 from colorama import Cursor
 from colorama import init as colorama_init
 
@@ -15,6 +14,7 @@ PROGRESS_WIDTH = 50
 ALIAS_WIDTH = 100
 FILL = 2
 CLEAR_EOL = '\033[K'
+BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
 
 
 class ProgressBar(object):
@@ -33,7 +33,8 @@ class ProgressBar(object):
             'control': False,
             'show_prefix': True,
             'show_fraction': True,
-            'show_percentage': True
+            'show_percentage': True,
+            'use_color': True
         }
         for (attribute, default) in defaults.items():
             setattr(self, attribute, kwargs.get(attribute, default))
@@ -65,10 +66,11 @@ class ProgressBar(object):
     def __str__(self):
         """ return string interpretation of class instance
         """
-        bright_yellow = Style.BRIGHT + Fore.YELLOW + Back.BLACK
-
         # determine alias
-        alias = f" {bright_yellow}{self.alias}{Style.RESET_ALL}"
+        if self.use_color:
+            alias = f" {BRIGHT_YELLOW}{self.alias}{Style.RESET_ALL}"
+        else:
+            alias = f" {self.alias}"
 
         # determine progress
         progress = self._get_progress().strip()
@@ -77,7 +79,10 @@ class ProgressBar(object):
         completed = ''
         if self._completed and self._reset:
             completed_fill = self._fill['completed']
-            completed = f' {bright_yellow}[{str(self._completed).zfill(completed_fill)}]'
+            if self.use_color:
+                completed = f' {BRIGHT_YELLOW}[{str(self._completed).zfill(completed_fill)}]'
+            else:
+                completed = f' [{str(self._completed).zfill(completed_fill)}]'
 
         return f"{progress}{completed}{alias}"
 
@@ -222,7 +227,10 @@ class ProgressBar(object):
                 fraction = _fraction
             percentage = ''
             if self.show_percentage:
-                percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
+                if self.use_color:
+                    percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
+                else:
+                    percentage = f'{_percentage}% '
             bar = self._ticker * self._modulus_count
             padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
             progress = f"{prefix}|{bar}{padding}|{percentage}{fraction}"
