@@ -1,7 +1,7 @@
 import re
 import sys
 import logging
-
+import datetime
 import cursor
 from colorama import Style
 from colorama import Fore
@@ -34,7 +34,8 @@ class ProgressBar(object):
             'show_prefix': True,
             'show_fraction': True,
             'show_percentage': True,
-            'use_color': True
+            'use_color': True,
+            'show_duration': False
         }
         for (attribute, default) in defaults.items():
             setattr(self, attribute, kwargs.get(attribute, default))
@@ -43,7 +44,8 @@ class ProgressBar(object):
             raise ValueError('ticker value not in supported range')
         self._ticker = chr(ticker)
         # self.complete boolean to track if progress bar has completed
-        self.complete = False
+        # self.complete = False
+        self.__dict__['complete'] = False
         # self._completed int to track the number of progress bar completions
         # it's typically just 1 but can be multiple when using .reset()
         self._completed = 0
@@ -60,6 +62,7 @@ class ProgressBar(object):
         # execute after total is set
         self._fill = self._get_fill(kwargs.get('fill', {}))
         if total:
+            self._start_time = datetime.datetime.now()
             # print progress bar if total specified in constructor
             self._print(False)
 
@@ -92,14 +95,27 @@ class ProgressBar(object):
         if name == 'count' and self.total is None:
             return
         super(ProgressBar, self).__setattr__(name, value)
-        if name in ['total', 'count']:
+        if name in ['total', 'count', 'complete']:
             if name == 'count':
                 self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
-            else:
+                self._print(True)
+            elif name == 'total':
                 if not self._fill['total']:
                     # only set fill for total if is is not set
                     self._fill['total'] = len(str(value))
-            self._print(name == 'count')
+                if value and not self._completed:
+                    # only start the timer once even if reset
+                    self._start_time = datetime.datetime.now()
+                self._print(False)
+            else:
+                if value:
+                    # if complete is true then set stop time and compute duration
+                    self._stop_time = datetime.datetime.now()
+                    start = self._start_time.time().strftime('%H:%M:%S')
+                    stop = self._stop_time.time().strftime('%H:%M:%S')
+                    self.duration = str(datetime.datetime.strptime(stop, '%H:%M:%S') - datetime.datetime.strptime(start, '%H:%M:%S'))
+                else:
+                    self.duration = None
 
     def __enter__(self):
         """ on entry - hide cursor if show and stderr is attached to tty
@@ -193,7 +209,7 @@ class ProgressBar(object):
         progress = 'Processing complete'
         if self.completed_message:
             progress = self.completed_message
-        if self.duration:
+        if self.duration and self.show_duration:
             progress = f'{progress} - {self.duration}'
         return progress
 

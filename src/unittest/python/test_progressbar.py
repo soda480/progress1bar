@@ -231,7 +231,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_complete_Should_ReturnExpected_When_MessageAndDuration(self, *patches):
-        pbar = ProgressBar()
+        pbar = ProgressBar(show_duration=True)
         pbar.completed_message = 'All done'
         pbar.duration = '01:23:45'
         result = pbar._get_complete()
@@ -241,7 +241,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__get_complete_Should_ReturnExpected_When_NoMessageAndDuration(self, *patches):
-        pbar = ProgressBar()
+        pbar = ProgressBar(show_duration=True)
         pbar.duration = '01:23:45'
         result = pbar._get_complete()
         expected_result = 'Processing complete - 01:23:45'
@@ -259,7 +259,7 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.colorama_init')
     @patch('progress1bar.progressbar.ProgressBar._get_complete')
     def test__get_progress_Should_ReturnExpected_When_Complete(self, get_complete_patch, *patches):
-        pbar = ProgressBar()
+        pbar = ProgressBar(total=10)
         pbar.complete = True
         result = pbar._get_progress()
         self.assertEqual(result, get_complete_patch.return_value)

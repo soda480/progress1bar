@@ -107,7 +107,7 @@ with ProgressBar(total=75, completed_message=completed_message, clear_alias=True
 
 #### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
 
-Configure `ProgressBar` with a non-default ticker, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
+Configure `ProgressBar` with a custom ticker, show duration, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
 
 <details><summary>Code</summary>
 
@@ -121,7 +121,7 @@ regex = {
     'count': r'^processed .*$',
     'alias': r'^processor is (?P<value>.*)$'
 }
-with ProgressBar(ticker=10148, regex=regex, use_color=False) as pb:
+with ProgressBar(ticker=9616, regex=regex, use_color=False, show_duration=True) as pb:
     pb.match(f'processor is {names.get_full_name()}')
     total = random.randint(500, 1000)
     pb.match(f'processing total of {total}')
