@@ -15,7 +15,7 @@ name = 'progress1bar'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A simple ANSI-based progress bar'
 url = 'https://github.com/soda480/progress1bar'
-version = '0.2.6'
+version = '0.2.7'
 default_task = [
     'clean',
     'analyze',
@@ -59,7 +59,7 @@ def set_properties(project):
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: System :: Networking',
         'Topic :: System :: Systems Administration'])
-    project.set_property('radon_break_build_average_complexity_threshold', 4)
+    project.set_property('radon_break_build_average_complexity_threshold', 5)
     project.set_property('radon_break_build_complexity_threshold', 10)
     project.set_property('bandit_break_build', True)
     project.set_property('anybadge_exclude', 'coverage, complexity')
