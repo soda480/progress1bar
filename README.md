@@ -6,7 +6,7 @@
 [![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
 [![python](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-teal)](https://www.python.org/downloads/)
 
-A simple ANSI-based progress bar.
+A customizable ANSI-based progress bar.
 
 ## Installation
 ```bash
@@ -16,7 +16,19 @@ pip install progress1bar
 ### `ProgressBar`
 
 ```
-ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_alias=False, show_prefix=True, show_fraction=True, show_percentage=True, ticker=None, use_color=True)
+ProgressBar(
+    total=None,
+    fill=None,
+    regex=None,
+    completed_message=None,
+    clear_alias=False,
+    show_prefix=True,
+    show_fraction=True,
+    show_percentage=True,
+    show_duration=False,
+    show_complete=True,
+    ticker=None,
+    use_color=True)
 ```
 
 <details><summary>Documentation</summary>
@@ -36,6 +48,10 @@ ProgressBar(total=None, fill=None, regex=None, completed_message=None, clear_ali
 > `show_fraction` - A boolean to designate if the fraction should be printed with the progress bar.
 
 > `show_percentage` - A boolean to designate if the percentage should be printed with the progress bar.
+
+> `show_duration` - A boolean to designate if the duration should be printed after progress bar execution.
+
+> `show_complete` - A boolean to designate if the completed message is to be displayed upon progress bar completion.
 
 > `ticker` - A integer representing unicode character to print as the progress bar ticker. Refer to [unicode chart](https://www.ssec.wisc.edu/~tomw/java/unicode.html) for values. Default is 9632 (black square ■).
 
@@ -69,7 +85,7 @@ The `ProgressBar` class is used to display function execution as a progress bar.
 import time
 from progress1bar import ProgressBar
 
-with ProgressBar(total=250, show_prefix=False, show_fraction=True) as pb:
+with ProgressBar(total=250) as pb:
     for _ in range(pb.total):
         pb.count += 1
         # simulate work
@@ -88,14 +104,13 @@ Configure `ProgressBar` to display an alias for the item that is currently being
 
 ```Python
 import time
-import names
+from faker import Faker
 from progress1bar import ProgressBar
 
-print('Processing names...')
-completed_message = 'Processed names'
-with ProgressBar(total=75, completed_message=completed_message, clear_alias=True, show_fraction=False, show_prefix=False) as pb:
+completed_message = 'Processed names complete'
+with ProgressBar(total=75, completed_message=completed_message, clear_alias=True, show_fraction=False, show_prefix=False, show_duration=True) as pb:
     for _ in range(pb.total):
-        pb.alias = names.get_full_name()
+        pb.alias = Faker().name()
         # simulate work
         time.sleep(.08)
         pb.count += 1
@@ -113,7 +128,7 @@ Configure `ProgressBar` with a custom ticker, show duration, do not use color, a
 
 ```Python
 import random
-import names
+from faker import Faker
 from progress1bar import ProgressBar
 
 regex = {
@@ -121,12 +136,12 @@ regex = {
     'count': r'^processed .*$',
     'alias': r'^processor is (?P<value>.*)$'
 }
-with ProgressBar(ticker=9616, regex=regex, use_color=False, show_duration=True) as pb:
-    pb.match(f'processor is {names.get_full_name()}')
-    total = random.randint(500, 1000)
+with ProgressBar(ticker=9733, regex=regex, use_color=False, show_duration=True) as pb:
+    pb.match(f'processor is {Faker().name()}')
+    total = random.randint(500, 750)
     pb.match(f'processing total of {total}')
     for _ in range(total):
-        pb.match(f'processed {names.get_full_name()}')
+        pb.match(f'processed {Faker().name()}')
 ```
 
 </details>
@@ -142,24 +157,24 @@ Configure `ProgressBar` to show and reuse progress for several iterations:
 ```Python
 import random
 import time
-import names
+from faker import Faker
 from progress1bar import ProgressBar
 
-TOTAL_ITEMS = 800
+TOTAL_ITEMS = 300
 ITERATIONS = 4
 
 print(f'Execute {ITERATIONS} iterations of varying totals:')
-with ProgressBar(show_prefix=False, show_fraction=False) as pb:
+with ProgressBar(show_prefix=False, show_fraction=False, show_duration=True) as pb:
     iterations = 0
     while True:
         if iterations == ITERATIONS:
             pb.alias = ''
             pb.complete = True
             break
-        pb.alias = names.get_full_name()
-        pb.total = random.randint(500, TOTAL_ITEMS)
+        pb.alias = Faker().name()
+        pb.total = random.randint(100, TOTAL_ITEMS)
         for _ in range(pb.total):
-            names.get_full_name()
+            Faker().name()
             pb.count += 1
         iterations += 1
         pb.reset()

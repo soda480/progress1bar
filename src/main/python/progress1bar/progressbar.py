@@ -1,269 +1,134 @@
-import re
 import sys
 import logging
 import datetime
 import cursor
-from colorama import Style
-from colorama import Fore
 from colorama import Cursor
 from colorama import init as colorama_init
+from .prefixable import Prefixable
+from .aliasable import Aliasable
+from .durationable import Durationable
+from .completable import Completable
+from .resettable import Resettable
+from .fillable import Fillable
+from .matchable import Matchable
 
 logger = logging.getLogger(__name__)
-
+TICKER = 9632
 PROGRESS_WIDTH = 50
-ALIAS_WIDTH = 100
-FILL = 2
 CLEAR_EOL = '\033[K'
-BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
 
 
-class ProgressBar(object):
-    """ Progress Bar implementation
+class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, Fillable, Matchable):
+    """ display progress bar
     """
-
-    def __init__(self, **kwargs):
-        """ class constructor
-        """
-        logger.debug('executing ProgressBar constructor')
+    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, **kwargs):
+        logger.debug('executing constructor for ProgressBar')
+        self._previous = None
+        super().__init__(**kwargs)
         colorama_init()
-        defaults = {
-            'regex': {},
-            'completed_message': 'Processing complete',
-            'clear_alias': False,
-            'control': False,
-            'show_prefix': True,
-            'show_fraction': True,
-            'show_percentage': True,
-            'use_color': True,
-            'show_duration': False
-        }
-        for (attribute, default) in defaults.items():
-            setattr(self, attribute, kwargs.get(attribute, default))
-        ticker = kwargs.get('ticker', 9632)
+        self._show_percentage = show_percentage
+        self._show_fraction = show_fraction
+        self._modulus_count = 0
+        self._count = 0
+        self._use_color = use_color
+        self._control = control
+        if not ticker:
+            ticker = TICKER
         if not (32 < ticker < 65533):
             raise ValueError('ticker value not in supported range')
         self._ticker = chr(ticker)
-        # self.complete boolean to track if progress bar has completed
-        # self.complete = False
-        self.__dict__['complete'] = False
-        # self._completed int to track the number of progress bar completions
-        # it's typically just 1 but can be multiple when using .reset()
-        self._completed = 0
-        # include support for durations
-        self.duration = None
-        self._modulus_count = 0
-        # self._reset int keeps track of the number of times the progress bar has been reset
-        self._reset = 0
-        self.alias = ''
-        # avoid __setattr__
-        self.__dict__['count'] = 0
-        total = kwargs.get('total')
-        self.__dict__['total'] = total
-        # execute after total is set
-        self._fill = self._get_fill(kwargs.get('fill', {}))
-        if total:
-            self._start_time = datetime.datetime.now()
-            # print progress bar if total specified in constructor
-            self._print(False)
-
-    def __str__(self):
-        """ return string interpretation of class instance
-        """
-        # determine alias
-        if self.use_color:
-            alias = f" {BRIGHT_YELLOW}{self.alias}{Style.RESET_ALL}"
-        else:
-            alias = f" {self.alias}"
-
-        # determine progress
-        progress = self._get_progress().strip()
-
-        # determine completed
-        completed = ''
-        if self._completed and self._reset:
-            completed_fill = self._fill['completed']
-            if self.use_color:
-                completed = f' {BRIGHT_YELLOW}[{str(self._completed).zfill(completed_fill)}]'
-            else:
-                completed = f' [{str(self._completed).zfill(completed_fill)}]'
-
-        return f"{progress}{completed}{alias}"
-
-    def __setattr__(self, name, value):
-        """ set class instance attributes
-        """
-        if name == 'count' and self.total is None:
-            return
-        super(ProgressBar, self).__setattr__(name, value)
-        if name in ['total', 'count', 'complete']:
-            if name == 'count':
-                self._modulus_count = round(round(self.count / self.total, 2) * PROGRESS_WIDTH)
-                self._print(True)
-            elif name == 'total':
-                if not self._fill['total']:
-                    # only set fill for total if is is not set
-                    self._fill['total'] = len(str(value))
-                if value and not self._completed:
-                    # only start the timer once even if reset
-                    self._start_time = datetime.datetime.now()
-                self._print(False)
-            else:
-                if value:
-                    # if complete is true then set stop time and compute duration
-                    self._stop_time = datetime.datetime.now()
-                    start = self._start_time.time().strftime('%H:%M:%S')
-                    stop = self._stop_time.time().strftime('%H:%M:%S')
-                    self.duration = str(datetime.datetime.strptime(stop, '%H:%M:%S') - datetime.datetime.strptime(start, '%H:%M:%S'))
-                else:
-                    self.duration = None
+        # execute total setter
+        self.total = total
 
     def __enter__(self):
-        """ on entry - hide cursor if show and stderr is attached to tty
-        """
-        if not self.control and sys.stderr.isatty():
+        if not self._control and sys.stderr.isatty():
             cursor.hide()
         return self
 
     def __exit__(self, *args):
-        """ on exit - show cursor if show and stderr is attached to tty and print progress bar
-        """
-        if self.clear_alias:
-            self.alias = ''
-        self._print(True)
-        if not self.control and sys.stderr.isatty():
+        # force print on exit if not being controlled externally
+        self._print(True, force=not self._control)
+        if not self._control and sys.stderr.isatty():
             cursor.show()
 
-    def _print(self, clear):
-        """ print progress bar on certain conditions
-            sys.stderr is attached to a tty and if progress bar is not being controlled externally
-            clear line prior to printing if clear is set or if progress bar has been reset
-        """
-        if self.control or not sys.stderr.isatty():
+    def __str__(self):
+        if self._complete and self._show_complete:
+            return f'{self.completed_message}{self.duration}{self.completed}{self.alias}'
+        return f'{self.prefix}{self.bar}{self.percentage}{self.fraction}{self.completed}{self.alias}{self.duration}'
+
+    @property
+    def bar(self):
+        tickers = self._ticker * self._modulus_count
+        padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
+        return f"|{tickers}{padding}|"
+
+    @property
+    def percentage(self):
+        if not self._show_percentage:
+            return ''
+        if self._total:
+            return f'{str(round((self._count / self._total) * 100)).rjust(3)}%'
+        return '0'.rjust(3) + '%'
+
+    @property
+    def fraction(self):
+        if not self._show_fraction:
+            return ''
+        if self._total:
+            # Fillable._fill
+            fill = self._fill['total']
+            return f' {str(self._count).zfill(fill)}/{str(self._total).zfill(fill)}'
+        return ' ##/##'
+
+    @property
+    def total(self):
+        return self._total
+
+    @total.setter
+    def total(self, value):
+        self._total = value
+        if value:
+            if not self._fill['total']:
+                self.set_fill_total(value)
+            # Resettable._reset_count
+            if not self._reset_count:
+                # ensures start_time is started once not after reset
+                # access private attribute Durationable._start_time
+                self._start_time = datetime.datetime.now()
+            # print progress bar only if total was assigned an actual value
+            self._print(False)
+
+    @property
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, value):
+        if not self._total:
             return
-        if clear or self._reset:
+        self._count = value
+        self._modulus_count = round(round(self._count / self._total, 2) * PROGRESS_WIDTH)
+        if self._count == self._total:
+            self.complete = True
+            self._completed += 1
+        self._print(True)
+
+    def _print(self, clear, force=False):
+        if not force:
+            # not force printing
+            if (self._control or not sys.stderr.isatty()):
+                # printing of progress bar is controlled externally
+                # is not attached to terminal
+                return
+            if (str(self) == self._previous):
+                # logger.debug('not printing because current is same as previous')
+                return
+
+        if clear or self._reset_count:
+            # line is explictly cleared
+            # progress bar reset enabled - ensures next progress bar is printed
+            # on same line as previous
             print(f'{Cursor.UP(1)}{CLEAR_EOL}', end='', file=sys.stderr)
         print(self, file=sys.stderr)
         sys.stderr.flush()
-
-    def reset(self):
-        """ reset progress bar
-        """
-        logger.debug('resetting progress bar')
-        self.alias = ''
-        self.__dict__['total'] = None
-        self.complete = False
-        self._modulus_count = 0
-        # avoid __setattr__ for setting count value
-        self.__dict__['count'] = 0
-        self._reset += 1
-
-    def match(self, text):
-        """ call match functions and return on first success
-        """
-        functions = [self._match_total, self._match_alias, self._match_count]
-        for function in functions:
-            match = function(text)
-            if match:
-                return match
-
-    def _match_total(self, text):
-        """ set total if text matches total regex
-        """
-        match = None
-        if self.total is None:
-            regex = self.regex.get('total')
-            if regex:
-                match = re.match(regex, text)
-                if match:
-                    self.total = int(match.group('value'))
-        return match
-
-    def _match_alias(self, text):
-        """ set alias if text matches alias regex
-        """
-        match = None
-        regex = self.regex.get('alias')
-        if regex:
-            match = re.match(regex, text)
-            if match:
-                value = match.group('value')
-                if len(value) > ALIAS_WIDTH:
-                    value = f'{value[0:ALIAS_WIDTH - 3]}...'
-                self.alias = value
-        return match
-
-    def _match_count(self, text):
-        """ increment count if text matches count regex
-        """
-        match = None
-        regex = self.regex.get('count')
-        if regex:
-            match = re.match(regex, text)
-            if match:
-                self.count += 1
-        return match
-
-    def _get_complete(self):
-        """ return completed message
-        """
-        progress = 'Processing complete'
-        if self.completed_message:
-            progress = self.completed_message
-        if self.duration and self.show_duration:
-            progress = f'{progress} - {self.duration}'
-        return progress
-
-    def _get_percent_fraction(self):
-        """ return tuple consisting of percentage and fraction for instance of non-completed progress bar
-        """
-        if self.total:
-            total_fill = self._fill['total']
-            percentage = str(round((self.count / self.total) * 100)).rjust(3)
-            fraction = f'{str(self.count).zfill(total_fill)}/{str(self.total).zfill(total_fill)}'
-            if self.count == self.total:
-                self.complete = True
-                self._completed += 1
-        else:
-            percentage = '0'.rjust(3)
-            fraction = '#' * FILL + '/' + '#' * FILL
-        return percentage, fraction
-
-    def _get_progress(self):
-        """ return progress text
-        """
-        if self.complete:
-            progress = self._get_complete()
-        else:
-            _percentage, _fraction = self._get_percent_fraction()
-            prefix = ''
-            if self.show_prefix:
-                prefix = 'Processing '
-            fraction = ''
-            if self.show_fraction:
-                fraction = _fraction
-            percentage = ''
-            if self.show_percentage:
-                if self.use_color:
-                    percentage = f'{Style.BRIGHT}{_percentage}%{Style.RESET_ALL} '
-                else:
-                    percentage = f'{_percentage}% '
-            bar = self._ticker * self._modulus_count
-            padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
-            progress = f"{prefix}|{bar}{padding}|{percentage}{fraction}"
-        return progress
-
-    def _get_fill(self, data):
-        """ return fill dictionary derived from data values
-        """
-        fill = {
-            'total': None,
-            'completed': None
-        }
-        if not data:
-            fill['completed'] = FILL
-        else:
-            fill['completed'] = len(str(data.get('max_completed', FILL * '-')))
-            fill['total'] = len(str(data.get('max_total', FILL * '-')))
-        if self.total and not fill['total']:
-            fill['total'] = len(str(self.total))
-        return fill
+        self._previous = str(self)

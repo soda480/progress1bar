@@ -1,13 +1,15 @@
 #   -*- coding: utf-8 -*-
 import time
 import random
-import names
+from faker import Faker
 from progress1bar import ProgressBar
+from mock import patch
 
-with ProgressBar(use_color=False) as pb:
-    pb.alias = names.get_full_name()
-    pb.total = random.randint(50, 100)
-    for _ in range(pb.total):
-        pb.count += 1
-        # simulate work
-        time.sleep(random.choice([.03, .06, .09]))
+with patch('sys.stderr.isatty', return_value=False):
+    with ProgressBar(use_color=True, show_duration=True, control=False, show_complete=False) as pb:
+        pb.alias = Faker().name()
+        pb.total = random.randint(50, 100)
+        for _ in range(pb.total):
+            pb.count += 1
+            # simulate work
+            time.sleep(random.choice([.03, .06, .09]))
