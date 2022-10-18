@@ -30,7 +30,7 @@ description = summary
 @init
 def set_properties(project):
     project.set_property('unittest_module_glob', 'test_*.py')
-    project.set_property('coverage_break_build', False)
+    project.set_property('coverage_break_build', True)
     project.set_property('flake8_max_line_length', 120)
     project.set_property('flake8_verbose_output', True)
     project.set_property('flake8_break_build', True)
@@ -51,4 +51,4 @@ def set_properties(project):
     project.set_property('radon_break_build_average_complexity_threshold', 5)
     project.set_property('radon_break_build_complexity_threshold', 10)
     project.set_property('bandit_break_build', True)
-    project.set_property('anybadge_exclude', 'coverage, complexity')
+    project.set_property('anybadge_exclude', 'complexity')

@@ -1,6 +1,6 @@
 # progress1bar
 [![build](https://github.com/soda480/progress1bar/actions/workflows/main.yml/badge.svg)](https://github.com/soda480/progress1bar/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/soda480/progress1bar/branch/main/graph/badge.svg?token=6zIZLnSJ0T)](https://codecov.io/gh/soda480/progress1bar)
+[![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://pybuilder.io/)
 [![Code Grade](https://api.codiga.io/project/25921/status/svg)](https://app.codiga.io/public/project/25921/progress1bar/dashboard)
 [![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
 [![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
@@ -184,6 +184,11 @@ with ProgressBar(show_prefix=False, show_fraction=False, show_duration=True) as 
 </details>
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example4.gif)
+
+### Programs using `progress1bar`
+
+* [pypbars](https://pypi.org/project/pypbars/)
+* [mppbar](https://pypi.org/project/mppbar/)
 
 ## Development ##
 
