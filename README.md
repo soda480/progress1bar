@@ -100,7 +100,7 @@ with ProgressBar(total=250) as pb:
 
 #### [example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)
 
-Configure `ProgressBar` to display an alias for the item that is currently being processd by setting the `alias` parameter, specify fill dictionary parameter to ensure the progress bar digits are displayed uniformly:
+Configure `ProgressBar` to display an alias for the item that is currently being processed by setting the `alias` parameter:
 
 <details><summary>Code</summary>
 
@@ -121,6 +121,37 @@ with ProgressBar(total=75, completed_message=completed_message, clear_alias=True
 </details>
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
+
+#### [example2b](https://github.com/soda480/progress1bar/tree/master/examples/example2b.py)
+
+Configure `ProgressBar` to display an alias for the item that is currently being processed, but do not print out the ticker, instead show percentage and fraction complete:
+
+<details><summary>Code</summary>
+
+```Python
+import time
+from faker import Faker
+from progress1bar import ProgressBar
+
+arguments = {
+    'total': 575,
+    'clear_alias': True,
+    'show_complete': False,
+    'show_prefix': False,
+    'show_duration': True,
+    'show_bar': False
+}
+with ProgressBar(**arguments) as pb:
+    for _ in range(pb.total):
+        pb.alias = Faker().sentence()
+        # simulate work
+        pb.count += 1
+```
+
+</details>
+
+![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2b.gif)
+
 
 #### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
 
