@@ -196,8 +196,7 @@ Clone the repository and ensure the latest version of Docker is installed on you
 Build the Docker image:
 ```sh
 docker image build \
--t \
-progress1bar:latest .
+-t progress1bar:latest .
 ```
 
 Run the Docker container:

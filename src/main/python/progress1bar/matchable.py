@@ -25,9 +25,7 @@ class Matchable:
         """
         functions = [self._match_total, self._match_alias, self._match_count]
         for function in functions:
-            match = function(text)
-            if match:
-                return match
+            function(text)
 
     def _match_total(self, text):
         """ set total if text matches total regex
