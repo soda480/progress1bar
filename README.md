@@ -27,7 +27,8 @@ ProgressBar(
     show_duration=False,
     show_complete=True,
     ticker=None,
-    use_color=True)
+    use_color=True,
+    show_bar=True)
 ```
 
 <details><summary>Documentation</summary>
@@ -61,6 +62,8 @@ ProgressBar(
 > `count` - An integer attribute to increment that designates the current count. When count reaches total the progress bar will show complete.
 
 > `alias` - A string attribute to set the alias of the progress bar.
+
+> `show_bar` - A boolean to designate if the progress bar tickers should be printed.
 
 **Functions**
 

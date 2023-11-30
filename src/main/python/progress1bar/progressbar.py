@@ -21,11 +21,12 @@ CLEAR_EOL = '\033[K'
 class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, Fillable, Matchable):
     """ display progress bar
     """
-    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, **kwargs):
+    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, show_bar=True, **kwargs):
         logger.debug('executing constructor for ProgressBar')
         self._previous = None
         super().__init__(**kwargs)
         colorama_init()
+        self._show_bar = show_bar
         self._show_percentage = show_percentage
         self._show_fraction = show_fraction
         self._modulus_count = 0
@@ -58,6 +59,8 @@ class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, 
 
     @property
     def bar(self):
+        if not self._show_bar:
+            return ''
         tickers = self._ticker * self._modulus_count
         padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
         return f"|{tickers}{padding}|"
