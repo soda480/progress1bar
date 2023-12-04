@@ -1,10 +1,8 @@
 #   -*- coding: utf-8 -*-
-import time
 from faker import Faker
 from progress1bar import ProgressBar
 
-
-arguments = {
+kwargs = {
     'total': 575,
     'clear_alias': True,
     'show_complete': False,
@@ -12,7 +10,7 @@ arguments = {
     'show_duration': True,
     'show_bar': False
 }
-with ProgressBar(**arguments) as pb:
+with ProgressBar(**kwargs) as pb:
     for _ in range(pb.total):
         pb.alias = Faker().sentence()
         # simulate work

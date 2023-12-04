@@ -3,7 +3,7 @@ import random
 from faker import Faker
 from progress1bar import ProgressBar
 
-arguments = {
+kwargs = {
     'clear_alias': True,
     'show_complete': False,
     'show_prefix': False,
@@ -15,7 +15,7 @@ arguments = {
         'alias': r'^processed (?P<value>.*)$'
     }
 }
-with ProgressBar(**arguments) as pb:
+with ProgressBar(**kwargs) as pb:
     total = random.randint(500, 750)
     pb.match(f'processing total of {total} items')
     for _ in range(total):
