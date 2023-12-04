@@ -57,13 +57,13 @@ ProgressBar(
 
 > `use_color` - A boolean to designate if the progress bar should be displayed with color. Default is `True`.
 
+> `show_bar` - A boolean to designate if the progress bar tickers should be printed.
+
 **Attributes**
 
 > `count` - An integer attribute to increment that designates the current count. When count reaches total the progress bar will show complete.
 
 > `alias` - A string attribute to set the alias of the progress bar.
-
-> `show_bar` - A boolean to designate if the progress bar tickers should be printed.
 
 **Functions**
 
@@ -81,8 +81,6 @@ Various [examples](https://github.com/soda480/progress1bar/tree/master/examples)
 
 The `ProgressBar` class is used to display function execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
 
-<details><summary>Code</summary>
-
 ```Python
 import time
 from progress1bar import ProgressBar
@@ -94,23 +92,26 @@ with ProgressBar(total=250) as pb:
         time.sleep(.01)
 ```
 
-</details>
-
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
 
 #### [example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)
 
 Configure `ProgressBar` to display an alias for the item that is currently being processed by setting the `alias` parameter:
 
-<details><summary>Code</summary>
-
 ```Python
 import time
 from faker import Faker
 from progress1bar import ProgressBar
 
-completed_message = 'Processed names complete'
-with ProgressBar(total=75, completed_message=completed_message, clear_alias=True, show_fraction=False, show_prefix=False, show_duration=True) as pb:
+kwargs = {
+    'total': 75,
+    'completed_message': 'Processed names complete',
+    'clear_alias': True,
+    'show_fraction': False,
+    'show_prefix': False,
+    'show_duration': True
+}
+with ProgressBar(**kwargs) as pb:
     for _ in range(pb.total):
         pb.alias = Faker().name()
         # simulate work
@@ -118,22 +119,17 @@ with ProgressBar(total=75, completed_message=completed_message, clear_alias=True
         pb.count += 1
 ```
 
-</details>
-
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
 
 #### [example2b](https://github.com/soda480/progress1bar/tree/master/examples/example2b.py)
 
 Configure `ProgressBar` to display an alias for the item that is currently being processed, but do not print out the ticker, instead show percentage and fraction complete:
 
-<details><summary>Code</summary>
-
 ```Python
-import time
 from faker import Faker
 from progress1bar import ProgressBar
 
-arguments = {
+kwargs = {
     'total': 575,
     'clear_alias': True,
     'show_complete': False,
@@ -141,14 +137,12 @@ arguments = {
     'show_duration': True,
     'show_bar': False
 }
-with ProgressBar(**arguments) as pb:
+with ProgressBar(**kwargs) as pb:
     for _ in range(pb.total):
         pb.alias = Faker().sentence()
         # simulate work
         pb.count += 1
 ```
-
-</details>
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2b.gif)
 
@@ -157,35 +151,30 @@ with ProgressBar(**arguments) as pb:
 
 Configure `ProgressBar` with a custom ticker, show duration, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
 
-<details><summary>Code</summary>
-
 ```Python
-import random
 from faker import Faker
 from progress1bar import ProgressBar
 
-regex = {
-    'total': r'^processing total of (?P<value>\d+)$',
-    'count': r'^processed .*$',
-    'alias': r'^processor is (?P<value>.*)$'
+kwargs = {
+    'total': 575,
+    'clear_alias': True,
+    'show_complete': False,
+    'show_prefix': False,
+    'show_duration': True,
+    'show_bar': False
 }
-with ProgressBar(ticker=9733, regex=regex, use_color=False, show_duration=True) as pb:
-    pb.match(f'processor is {Faker().name()}')
-    total = random.randint(500, 750)
-    pb.match(f'processing total of {total}')
-    for _ in range(total):
-        pb.match(f'processed {Faker().name()}')
+with ProgressBar(**kwargs) as pb:
+    for _ in range(pb.total):
+        pb.alias = Faker().sentence()
+        # simulate work
+        pb.count += 1
 ```
-
-</details>
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example3.gif)
 
 #### [example4](https://github.com/soda480/progress1bar/tree/master/examples/example4.py)
 
 Configure `ProgressBar` to show and reuse progress for several iterations:
-
-<details><summary>Code</summary>
 
 ```Python
 import random
@@ -195,9 +184,13 @@ from progress1bar import ProgressBar
 
 TOTAL_ITEMS = 300
 ITERATIONS = 4
-
+kwargs = {
+    'show_prefix': False,
+    'show_fraction': False,
+    'show_duration': True
+}
 print(f'Execute {ITERATIONS} iterations of varying totals:')
-with ProgressBar(show_prefix=False, show_fraction=False, show_duration=True) as pb:
+with ProgressBar(**kwargs) as pb:
     iterations = 0
     while True:
         if iterations == ITERATIONS:
@@ -213,8 +206,6 @@ with ProgressBar(show_prefix=False, show_fraction=False, show_duration=True) as 
         pb.reset()
         time.sleep(.4)
 ```
-
-</details>
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example4.gif)
 

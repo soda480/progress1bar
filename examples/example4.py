@@ -6,9 +6,13 @@ from progress1bar import ProgressBar
 
 TOTAL_ITEMS = 300
 ITERATIONS = 4
-
+kwargs = {
+    'show_prefix': False,
+    'show_fraction': False,
+    'show_duration': True
+}
 print(f'Execute {ITERATIONS} iterations of varying totals:')
-with ProgressBar(show_prefix=False, show_fraction=False, show_duration=True) as pb:
+with ProgressBar(**kwargs) as pb:
     iterations = 0
     while True:
         if iterations == ITERATIONS:
