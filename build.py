@@ -15,7 +15,7 @@ name = 'progress1bar'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A customizable ANSI-based progress bar'
 url = 'https://github.com/soda480/progress1bar'
-version = '0.4.1'
+version = '0.4.2'
 default_task = [
     'clean',
     'analyze',

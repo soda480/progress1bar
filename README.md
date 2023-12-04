@@ -152,22 +152,27 @@ with ProgressBar(**kwargs) as pb:
 Configure `ProgressBar` with a custom ticker, show duration, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
 
 ```Python
+import random
 from faker import Faker
 from progress1bar import ProgressBar
 
 kwargs = {
-    'total': 575,
-    'clear_alias': True,
-    'show_complete': False,
-    'show_prefix': False,
-    'show_duration': True,
-    'show_bar': False
+    'ticker': 9733,
+    'regex': {
+        'total': r'^processing total of (?P<value>\d+)$',
+        'count': r'^processed .*$',
+        'alias': r'^processor is (?P<value>.*)$'
+    },
+    'use_color': False,
+    'show_duration': False
 }
 with ProgressBar(**kwargs) as pb:
-    for _ in range(pb.total):
-        pb.alias = Faker().sentence()
-        # simulate work
-        pb.count += 1
+    pb.match(f'processor is {Faker().name()}')
+    total = random.randint(500, 750)
+    pb.match(f'processing total of {total}')
+    for _ in range(total):
+        pb.match(f'processed {Faker().name()}')
+
 ```
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example3.gif)
