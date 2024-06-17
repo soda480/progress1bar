@@ -3,6 +3,8 @@ import logging
 import datetime
 import cursor
 from colorama import Cursor
+from colorama import Fore
+from colorama import Style
 from colorama import init as colorama_init
 from .prefixable import Prefixable
 from .aliasable import Aliasable
@@ -18,14 +20,19 @@ PROGRESS_WIDTH = 50
 CLEAR_EOL = '\033[K'
 
 
-class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, Fillable, Matchable):
+BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
+
+
+class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, Matchable):
     """ display progress bar
     """
-    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, show_bar=True, **kwargs):
+    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, show_bar=True, clear_alias=False, **kwargs):
         logger.debug('executing constructor for ProgressBar')
         self._previous = None
         super().__init__(**kwargs)
         colorama_init()
+        self._clear_alias = clear_alias
+        self._alias = None
         self._show_bar = show_bar
         self._show_percentage = show_percentage
         self._show_fraction = show_fraction
@@ -48,7 +55,7 @@ class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, 
 
     def __exit__(self, *args):
         # force print on exit if not being controlled externally
-        self._print(True, force=not self._control)
+        self.print(True, force=not self._control)
         if not self._control and sys.stderr.isatty():
             cursor.show()
 
@@ -99,7 +106,7 @@ class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, 
                 # access private attribute Durationable._start_time
                 self._start_time = datetime.datetime.now()
             # print progress bar only if total was assigned an actual value
-            self._print(False)
+            self.print(False)
 
     @property
     def count(self):
@@ -114,9 +121,9 @@ class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, 
         if self._count == self._total:
             self.complete = True
             self._completed += 1
-        self._print(True)
+        self.print(True)
 
-    def _print(self, clear, force=False):
+    def print(self, clear, force=False):
         if not force:
             # not force printing
             if (self._control or not sys.stderr.isatty()):
@@ -135,3 +142,18 @@ class ProgressBar(Prefixable, Aliasable, Durationable, Completable, Resettable, 
         print(self, file=sys.stderr)
         sys.stderr.flush()
         self._previous = str(self)
+
+    @property
+    def alias(self):
+        if not self._alias:
+            return ''
+        if self._complete and self._clear_alias:
+            return ''
+        if self._use_color:
+            return f' {BRIGHT_YELLOW}{self._alias}{Style.RESET_ALL}'
+        return f' {self._alias}'
+
+    @alias.setter
+    def alias(self, value):
+        self._alias = value
+        self.print(True)
