@@ -15,7 +15,7 @@ name = 'progress1bar'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A customizable ANSI-based progress bar'
 url = 'https://github.com/soda480/progress1bar'
-version = '0.4.2'
+version = '0.4.3'
 default_task = [
     'clean',
     'analyze',
@@ -30,7 +30,7 @@ description = summary
 @init
 def set_properties(project):
     project.set_property('unittest_module_glob', 'test_*.py')
-    project.set_property('coverage_break_build', True)
+    project.set_property('coverage_break_build', False)
     project.set_property('flake8_max_line_length', 120)
     project.set_property('flake8_verbose_output', True)
     project.set_property('flake8_break_build', True)

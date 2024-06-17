@@ -46,7 +46,7 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(result, 'Processing |■■■■■                                             | 10% 01/10')
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=True)
-    @patch('progress1bar.ProgressBar._print')
+    @patch('progress1bar.ProgressBar.print')
     @patch('progress1bar.progressbar.cursor')
     def test__enter_exit_Should_HideAndShowCursor_When_Tty(self, cursor_patch, print_patch, *patches):
         with ProgressBar(total=10):
@@ -55,7 +55,7 @@ class TestProgressBar(unittest.TestCase):
         self.assertTrue(call(True, force=True) in print_patch.mock_calls)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
-    @patch('progress1bar.ProgressBar._print')
+    @patch('progress1bar.ProgressBar.print')
     @patch('progress1bar.progressbar.cursor')
     def test__enter_exit_Should_NotHideOrShowCursor_When_NotTty(self, cursor_patch, print_patch, *patches):
         with ProgressBar():
@@ -67,14 +67,14 @@ class TestProgressBar(unittest.TestCase):
     def test__print_Should_NotPrint_When_NoTtyAndNotForced(self, stderr_patch, *patches):
         stderr_patch.isatty.return_value = False
         pb = ProgressBar()
-        pb._print(True)
+        pb.print(True)
         stderr_patch.flush.assert_not_called()
 
     @patch('progress1bar.progressbar.sys.stderr')
     def test__print_Should_NotPrint_When_TtyAndControlledNotForced(self, stderr_patch, *patches):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar(control=True)
-        pb._print(True)
+        pb.print(True)
         stderr_patch.flush.assert_not_called()
 
     @patch('progress1bar.progressbar.sys.stderr')
@@ -82,7 +82,7 @@ class TestProgressBar(unittest.TestCase):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar()
         pb._previous = 'Processing |                                                  |  0% ##/##'
-        pb._print(False)
+        pb.print(False)
         stderr_patch.flush.assert_not_called()
 
     @patch('builtins.print')
@@ -90,7 +90,7 @@ class TestProgressBar(unittest.TestCase):
     def test__print_Should_Print_When_TtyAndNoClear(self, stderr_patch, print_patch, *patches):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar()
-        pb._print(False)
+        pb.print(False)
         stderr_patch.flush.assert_called_once_with()
         self.assertEqual(len(print_patch.mock_calls), 1)
 
@@ -100,7 +100,7 @@ class TestProgressBar(unittest.TestCase):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar()
         pb._reset_count = 1
-        pb._print(False)
+        pb.print(False)
         stderr_patch.flush.assert_called_once_with()
         self.assertEqual(len(print_patch.mock_calls), 2)
 
@@ -109,7 +109,7 @@ class TestProgressBar(unittest.TestCase):
     def test__print_Should_ClearAndPrint_When_TtyAndClear(self, stderr_patch, print_patch, *patches):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar()
-        pb._print(True)
+        pb.print(True)
         stderr_patch.flush.assert_called_once_with()
         self.assertEqual(len(print_patch.mock_calls), 2)
 
@@ -123,13 +123,13 @@ class TestProgressBar(unittest.TestCase):
         pb = ProgressBar(show_fraction=False)
         self.assertEqual(pb.fraction, '')
 
-    @patch('progress1bar.ProgressBar._print')
+    @patch('progress1bar.ProgressBar.print')
     def test__count_Should_NotSetCount_When_NoTotal(self, *patches):
         pb = ProgressBar()
         pb.count = 1
         self.assertIsNone(pb.total)
 
-    @patch('progress1bar.ProgressBar._print')
+    @patch('progress1bar.ProgressBar.print')
     def test__count_Should_UpdateCompletedAttributes_When_CountEqualTotal(self, *patches):
         pb = ProgressBar(total=1)
         pb.count = 1

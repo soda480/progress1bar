@@ -18,16 +18,16 @@ class Aliasable:
         self._alias = None
         super().__init__(**kwargs)
 
-    @property
-    def alias(self):
-        if not self._alias:
-            return ''
-        if self._complete and self._clear_alias:
-            return ''
-        if self._use_color:
-            return f' {BRIGHT_YELLOW}{self._alias}{Style.RESET_ALL}'
-        return f' {self._alias}'
+    # @property
+    # def alias(self):
+    #     if not self._alias:
+    #         return ''
+    #     if self._complete and self._clear_alias:
+    #         return ''
+    #     if self._use_color:
+    #         return f' {BRIGHT_YELLOW}{self._alias}{Style.RESET_ALL}'
+    #     return f' {self._alias}'
 
-    @alias.setter
-    def alias(self, value):
-        self._alias = value
+    # @alias.setter
+    # def alias(self, value):
+    #     self._alias = value
