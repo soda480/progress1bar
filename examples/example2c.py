@@ -1,7 +1,7 @@
 #   -*- coding: utf-8 -*-
 from faker import Faker
 from progress1bar import ProgressBar
-from mock import patch
+from unittest.mock import patch
 
 kwargs = {
     'total': 575,
