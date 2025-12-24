@@ -1,3 +1,7 @@
+[![ci](https://github.com/soda480/progress1bar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soda480/progress1bar/actions/workflows/ci.yml)
+![Coverage](https://raw.githubusercontent.com/soda480/threaded-order/main/badges/coverage.svg)
+[![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
+
 # progress1bar
 
 A lightweight, ANSI-based progress bar for terminal output — configurable, readable, and easy to drop into loops or long-running jobs.
@@ -21,7 +25,7 @@ with ProgressBar(total=250) as pb:
         time.sleep(0.01)  # simulate work
 ```
 
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
+![example](https://raw.githubusercontent.com/soda480/progress1bar/main/docs/images/example1.gif)
 
 ## Showing what’s being processed (`alias`)
 
@@ -51,7 +55,7 @@ with ProgressBar(**kwargs) as pb:
         pb.count += 1
 ```
 
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
+![example](https://raw.githubusercontent.com/soda480/progress1bar/main/docs/images/example2.gif)
 
 ## Configuration
 
@@ -128,7 +132,7 @@ If you want to reuse one ProgressBar instance across multiple runs (and keep tra
 pb.reset()
 ```
 
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example4.gif)
+![example](https://raw.githubusercontent.com/soda480/progress1bar/main/docs/images/example4.gif)
 
 ### More Examples
 
