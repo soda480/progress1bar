@@ -16,9 +16,9 @@ class TestProgressBar(unittest.TestCase):
 
     def test__init_Should_RaiseValueError_When_TickerNotInRange(self, *patches):
         with self.assertRaises(ValueError):
-            ProgressBar(ticker=32)
+            ProgressBar(ticker=32, use_color=False)
         with self.assertRaises(ValueError):
-            ProgressBar(ticker=65534)
+            ProgressBar(ticker=65534, use_color=False)
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
@@ -38,12 +38,12 @@ class TestProgressBar(unittest.TestCase):
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=False)
     @patch('progress1bar.progressbar.colorama_init')
     def test__str_Should_ReturnExpected_When_NotComplete(self, *patches):
-        pbar = ProgressBar(total=10, show_complete=True)
+        pbar = ProgressBar(total=10, show_complete=True, use_color=False)
         pbar.count = 1
         self.assertEqual(pbar.count, 1)
         self.assertEqual(pbar.total, 10)
         result = str(pbar)
-        self.assertEqual(result, 'Processing |■■■■■                                             | 10% 01/10')
+        self.assertEqual(result, 'Processing |∎∎∎∎∎                                             | 10% 01/10')
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=True)
     @patch('progress1bar.ProgressBar.print')

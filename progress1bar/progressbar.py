@@ -46,7 +46,8 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
                 raise ValueError('ticker value not in supported range')
             self._ticker = chr(ticker) if ticker else chr(TICKER)
         else:
-            self._ticker = ticker if ticker else Style.BRIGHT + Fore.YELLOW + chr(TICKER) + Style.RESET_ALL
+            self._ticker = ticker if ticker else \
+                Style.BRIGHT + Fore.YELLOW + chr(TICKER) + Style.RESET_ALL
         # execute total setter
         self.total = total
 
