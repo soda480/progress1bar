@@ -24,6 +24,7 @@ with ProgressBar(**kwargs) as pb:
         for _ in range(pb.total):
             Faker().name()
             pb.count += 1
+            time.sleep(.001)
         iterations += 1
         pb.reset()
-        time.sleep(.4)
+        time.sleep(.8)

@@ -7,7 +7,7 @@ from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
 from .prefixable import Prefixable
-from .aliasable import Aliasable
+from .aliasable import Aliasable  # noqa: F401
 from .durationable import Durationable
 from .completable import Completable
 from .resettable import Resettable
@@ -15,7 +15,7 @@ from .fillable import Fillable
 from .matchable import Matchable
 
 logger = logging.getLogger(__name__)
-TICKER = 9632
+TICKER = 8718
 PROGRESS_WIDTH = 50
 CLEAR_EOL = '\033[K'
 
@@ -26,7 +26,8 @@ BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
 class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, Matchable):
     """ display progress bar
     """
-    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True, control=False, ticker=None, show_bar=True, clear_alias=False, **kwargs):
+    def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True,
+                 control=False, ticker=None, show_bar=True, clear_alias=False, **kwargs):
         logger.debug('executing constructor for ProgressBar')
         self._previous = None
         super().__init__(**kwargs)
@@ -40,11 +41,12 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
         self._count = 0
         self._use_color = use_color
         self._control = control
-        if not ticker:
-            ticker = TICKER
-        if not (32 < ticker < 65533):
-            raise ValueError('ticker value not in supported range')
-        self._ticker = chr(ticker)
+        if not self._use_color:
+            if ticker and not (32 < ticker < 65533):
+                raise ValueError('ticker value not in supported range')
+            self._ticker = chr(ticker) if ticker else chr(TICKER)
+        else:
+            self._ticker = ticker if ticker else Style.BRIGHT + Fore.YELLOW + chr(TICKER) + Style.RESET_ALL
         # execute total setter
         self.total = total
 
@@ -62,7 +64,8 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
     def __str__(self):
         if self._complete and self._show_complete:
             return f'{self.completed_message}{self.duration}{self.completed}{self.alias}'
-        return f'{self.prefix}{self.bar}{self.percentage}{self.fraction}{self.completed}{self.alias}{self.duration}'
+        return (f'{self.prefix}{self.bar}{self.percentage}{self.fraction}'
+                f'{self.completed}{self.alias}{self.duration}')
 
     @property
     def bar(self):

@@ -1,21 +1,61 @@
 # progress1bar
-[![build](https://github.com/soda480/progress1bar/actions/workflows/main.yml/badge.svg)](https://github.com/soda480/progress1bar/actions/workflows/main.yml)
-[![complexity](https://img.shields.io/badge/complexity-A-brightgreen)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
-[![coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)](https://pybuilder.io/)
-[![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
-[![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
-[![python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-teal)](https://www.python.org/downloads/)
 
-A customizable ANSI-based progress bar.
+A lightweight, ANSI-based progress bar for terminal output — configurable, readable, and easy to drop into loops or long-running jobs.
 
 ## Installation
 ```bash
 pip install progress1bar
 ```
 
-### `ProgressBar`
+## Quick start
 
+Use ProgressBar as a context manager. Set `total`, then increment `count`.
+
+```Python
+import time
+from progress1bar import ProgressBar
+
+with ProgressBar(total=250) as pb:
+    for _ in range(pb.total):
+        pb.count += 1
+        time.sleep(0.01)  # simulate work
 ```
+
+![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
+
+## Showing what’s being processed (`alias`)
+
+If you want the bar to show the “current item”, set `alias` as you go.  You can also set a custom ticker.
+
+```Python
+import time
+from faker import Faker
+from colorama import Fore
+from colorama import Style
+from progress1bar import ProgressBar
+
+kwargs = {
+    'total': 75,
+    'completed_message': 'Processed names complete',
+    'clear_alias': True,
+    'show_fraction': False,
+    'show_prefix': False,
+    'show_duration': True,
+    'use_color': True,
+    'ticker': Style.BRIGHT + Fore.CYAN + chr(9644) + Style.RESET_ALL,
+}
+with ProgressBar(**kwargs) as pb:
+    for _ in range(pb.total):
+        pb.alias = Faker().name()
+        time.sleep(.08) # simulate work
+        pb.count += 1
+```
+
+![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
+
+## Configuration
+
+```Python
 ProgressBar(
     total=None,
     fill=None,
@@ -32,125 +72,30 @@ ProgressBar(
     show_bar=True)
 ```
 
-<details><summary>Documentation</summary>
+| Option              | Type   | What it does                                      | Default                 |
+| ------------------- | ------ | ------------------------------------------------- | ----------------------- |
+| `total`             | `int`  | Total units of work to complete                   | `None`                  |
+| `completed_message` | `str`  | Message shown when complete                       | `"Processing complete"` |
+| `show_prefix`       | `bool` | Show the `"Processing "` prefix                   | `True`                  |
+| `show_fraction`     | `bool` | Show `count/total`                                | `True`                  |
+| `show_percentage`   | `bool` | Show percent complete                             | `True`                  |
+| `show_duration`     | `bool` | Print elapsed time after completion               | `False`                 |
+| `show_complete`     | `bool` | Show completion message                           | `True`                  |
+| `use_color`         | `bool` | ANSI color output                                 | `True`                  |
+| `show_bar`          | `bool` | Render ticker characters (the “bar” itself)       | `True`                  |
+| `ticker`            | `int`  | Unicode code point to use as the ticker character | `9632` (`■`)            |
 
-> `total` - An integer for the total number of items the progress bar will show that need to be completed.
+### Number formatting (`fill`)
 
-> `fill` - A dictionary whose key values are integers that dictate the number of leading zeros the progress bar should add to the `total` and `completed` values; this is optional and should be used to format the progress bar appearance. The supported key values are `max_total` and `max_completed`.
-
-> `regex` - A dictionary whose key values are regular expressions for `total`, `count` and `alias`. The regular expressions will be checked against the log messages intercepted from the executing function, if matched the value will be used to assign the attribute for the respective progress bar. The `total` and `count` key values are required, the `alias` key value is optional.
-
-> `completed_message` - A string to designate the message the progress bar should display when complete. Default is 'Processing complete'
-
-> `clear_alias` - A boolean to designate if the progress bar should clear the alias when complete.
-
-> `show_prefix` - A boolean to designate if the prefix of `Processing ` should be printed prefixing the progress bar.
-
-> `show_fraction` - A boolean to designate if the fraction should be printed with the progress bar.
-
-> `show_percentage` - A boolean to designate if the percentage should be printed with the progress bar.
-
-> `show_duration` - A boolean to designate if the duration should be printed after progress bar execution.
-
-> `show_complete` - A boolean to designate if the completed message is to be displayed upon progress bar completion.
-
-> `ticker` - A integer representing unicode character to print as the progress bar ticker. Refer to [unicode chart](https://www.ssec.wisc.edu/~tomw/java/unicode.html) for values. Default is 9632 (black square ■).
-
-> `use_color` - A boolean to designate if the progress bar should be displayed with color. Default is `True`.
-
-> `show_bar` - A boolean to designate if the progress bar tickers should be printed.
-
-**Attributes**
-
-> `count` - An integer attribute to increment that designates the current count. When count reaches total the progress bar will show complete.
-
-> `alias` - A string attribute to set the alias of the progress bar.
-
-**Functions**
-
-> **reset()**
->> Reset the progress bar so that it can be used again. It will maintain and show the number of times the progress bar has been used.
-
-</details>
-
-
-### Examples
-
-Various [examples](https://github.com/soda480/progress1bar/tree/master/examples) are included to demonstrate the progress1bar package. To run the examples, build the Docker image and run the Docker container using the instructions described in the [Development](#development) section.
-
-#### [example1](https://github.com/soda480/progress1bar/tree/master/examples/example1.py)
-
-The `ProgressBar` class is used to display function execution as a progress bar. Use it as a context manager, and simply set the `.total` and `.count` attributes accordingly. Here is an example:
+`fill` lets you pad the displayed total / count with leading zeros for a consistent look.
 
 ```Python
-import time
-from progress1bar import ProgressBar
-
-with ProgressBar(total=250) as pb:
-    for _ in range(pb.total):
-        pb.count += 1
-        # simulate work
-        time.sleep(.01)
+fill = {"max_total": 4, "max_completed": 4}
 ```
 
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example1.gif)
+### Regex-driven updates (`regex`)
 
-#### [example2](https://github.com/soda480/progress1bar/tree/master/examples/example2.py)
-
-Configure `ProgressBar` to display an alias for the item that is currently being processed by setting the `alias` parameter:
-
-```Python
-import time
-from faker import Faker
-from progress1bar import ProgressBar
-
-kwargs = {
-    'total': 75,
-    'completed_message': 'Processed names complete',
-    'clear_alias': True,
-    'show_fraction': False,
-    'show_prefix': False,
-    'show_duration': True
-}
-with ProgressBar(**kwargs) as pb:
-    for _ in range(pb.total):
-        pb.alias = Faker().name()
-        # simulate work
-        time.sleep(.08)
-        pb.count += 1
-```
-
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2.gif)
-
-#### [example2b](https://github.com/soda480/progress1bar/tree/master/examples/example2b.py)
-
-Configure `ProgressBar` to display an alias for the item that is currently being processed, but do not print out the ticker, instead show percentage and fraction complete:
-
-```Python
-from faker import Faker
-from progress1bar import ProgressBar
-
-kwargs = {
-    'total': 575,
-    'clear_alias': True,
-    'show_complete': False,
-    'show_prefix': False,
-    'show_duration': True,
-    'show_bar': False
-}
-with ProgressBar(**kwargs) as pb:
-    for _ in range(pb.total):
-        pb.alias = Faker().sentence()
-        # simulate work
-        pb.count += 1
-```
-
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example2b.gif)
-
-
-#### [example3](https://github.com/soda480/progress1bar/tree/master/examples/example3.py)
-
-Configure `ProgressBar` with a custom ticker, show duration, do not use color, and use regular expressions to determine the `total`, `count` and `alias` attributes:
+If you’d rather drive the progress bar by feeding it messages (instead of setting attributes directly), you can supply regex patterns for total, count, and optionally alias. When a message matches, the captured value is applied.
 
 ```Python
 import random
@@ -158,69 +103,38 @@ from faker import Faker
 from progress1bar import ProgressBar
 
 kwargs = {
-    'ticker': 9733,
-    'regex': {
-        'total': r'^processing total of (?P<value>\d+)$',
-        'count': r'^processed .*$',
-        'alias': r'^processor is (?P<value>.*)$'
+    "ticker": 9733,  # ★
+    "regex": {
+        "total": r"^processing total of (?P<value>\d+)$",
+        "count": r"^processed .*$",
+        "alias": r"^processor is (?P<value>.*)$",
     },
-    'use_color': False,
-    'show_duration': False
+    "use_color": False,
 }
-with ProgressBar(**kwargs) as pb:
-    pb.match(f'processor is {Faker().name()}')
-    total = random.randint(500, 750)
-    pb.match(f'processing total of {total}')
-    for _ in range(total):
-        pb.match(f'processed {Faker().name()}')
 
+with ProgressBar(**kwargs) as pb:
+    pb.match(f"processor is {Faker().name()}")
+    total = random.randint(500, 750)
+    pb.match(f"processing total of {total}")
+    for _ in range(total):
+        pb.match(f"processed {Faker().name()}")
 ```
 
-![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example3.gif)
+### Reuse the same progress bar (`reset()`)
 
-#### [example4](https://github.com/soda480/progress1bar/tree/master/examples/example4.py)
-
-Configure `ProgressBar` to show and reuse progress for several iterations:
+If you want to reuse one ProgressBar instance across multiple runs (and keep track of repeated usage), call:
 
 ```Python
-import random
-import time
-from faker import Faker
-from progress1bar import ProgressBar
-
-TOTAL_ITEMS = 300
-ITERATIONS = 4
-kwargs = {
-    'show_prefix': False,
-    'show_fraction': False,
-    'show_duration': True
-}
-print(f'Execute {ITERATIONS} iterations of varying totals:')
-with ProgressBar(**kwargs) as pb:
-    iterations = 0
-    while True:
-        if iterations == ITERATIONS:
-            pb.alias = ''
-            pb.complete = True
-            break
-        pb.alias = Faker().name()
-        pb.total = random.randint(100, TOTAL_ITEMS)
-        for _ in range(pb.total):
-            Faker().name()
-            pb.count += 1
-        iterations += 1
-        pb.reset()
-        time.sleep(.4)
+pb.reset()
 ```
 
 ![example](https://raw.githubusercontent.com/soda480/progress1bar/master/docs/images/example4.gif)
 
-### Programs using `progress1bar`
+### More Examples
 
-* [pypbars](https://pypi.org/project/pypbars/)
-* [mppbar](https://pypi.org/project/mppbar/)
+The repo includes multiple runnable examples (including variations like “no bar, just percentage/fraction”, custom tickers, regex matching, and multiple iterations with resets).
 
-## Development ##
+## Development
 
 Clone the repository and ensure the latest version of Docker is installed on your development server.
 
@@ -242,5 +156,5 @@ bash
 
 Execute the build:
 ```sh
-pyb -X
+make dev
 ```

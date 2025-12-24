@@ -1,6 +1,7 @@
-#   -*- coding: utf-8 -*-
 import time
 from faker import Faker
+from colorama import Fore
+from colorama import Style
 from progress1bar import ProgressBar
 
 kwargs = {
@@ -9,7 +10,9 @@ kwargs = {
     'clear_alias': True,
     'show_fraction': False,
     'show_prefix': False,
-    'show_duration': True
+    'show_duration': True,
+    'use_color': True,
+    'ticker': Style.BRIGHT + Fore.CYAN + chr(9644) + Style.RESET_ALL,
 }
 with ProgressBar(**kwargs) as pb:
     for _ in range(pb.total):
