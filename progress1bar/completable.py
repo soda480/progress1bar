@@ -44,7 +44,8 @@ class Completable:
             self._stop_time = datetime.datetime.now()
             start = self._start_time.time().strftime('%H:%M:%S')
             stop = self._stop_time.time().strftime('%H:%M:%S')
-            self._duration = str(datetime.datetime.strptime(stop, '%H:%M:%S') - datetime.datetime.strptime(start, '%H:%M:%S'))
+            self._duration = str(datetime.datetime.strptime(stop, '%H:%M:%S')
+                                 - datetime.datetime.strptime(start, '%H:%M:%S'))
         else:
             self._duration = None
             self._total = None
