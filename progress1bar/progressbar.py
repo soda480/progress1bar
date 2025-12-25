@@ -15,7 +15,7 @@ from .fillable import Fillable
 from .matchable import Matchable
 
 logger = logging.getLogger(__name__)
-TICKER = 8718
+TICKER = 9632  # ■
 PROGRESS_WIDTH = 50
 CLEAR_EOL = '\033[K'
 
