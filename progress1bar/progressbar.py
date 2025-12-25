@@ -6,6 +6,7 @@ from colorama import Cursor
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
+from .prefixable import Prefixable
 from .aliasable import Aliasable  # noqa: F401
 from .durationable import Durationable
 from .completable import Completable
@@ -22,7 +23,7 @@ CLEAR_EOL = '\033[K'
 BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
 
 
-class ProgressBar(Durationable, Completable, Resettable, Fillable, Matchable):
+class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, Matchable):
     """ display progress bar
     """
     def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True,
