@@ -65,7 +65,7 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
     def __str__(self):
         if self._complete and self._show_complete:
             return f'{self.completed_message}{self.duration}{self.completed}{self.alias}'
-        return (f'{self.prefix}{self.bar}{self.percentage}{self.fraction}'
+        return (f'{self.percentage}{self.fraction}{self.bar}'
                 f'{self.completed}{self.alias}{self.duration}')
 
     @property
@@ -74,7 +74,7 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
             return ''
         tickers = self._ticker * self._modulus_count
         padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
-        return f"|{tickers}{padding}|"
+        return f" {tickers}{padding}"
 
     @property
     def percentage(self):

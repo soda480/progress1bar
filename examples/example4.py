@@ -7,7 +7,6 @@ from progress1bar import ProgressBar
 TOTAL_ITEMS = 300
 ITERATIONS = 4
 kwargs = {
-    'show_prefix': False,
     'show_fraction': False,
     'show_duration': True
 }
