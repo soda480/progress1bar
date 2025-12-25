@@ -6,7 +6,6 @@ from colorama import Cursor
 from colorama import Fore
 from colorama import Style
 from colorama import init as colorama_init
-from .prefixable import Prefixable
 from .aliasable import Aliasable  # noqa: F401
 from .durationable import Durationable
 from .completable import Completable
@@ -23,7 +22,7 @@ CLEAR_EOL = '\033[K'
 BRIGHT_YELLOW = Style.BRIGHT + Fore.YELLOW
 
 
-class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, Matchable):
+class ProgressBar(Durationable, Completable, Resettable, Fillable, Matchable):
     """ display progress bar
     """
     def __init__(self, total=None, show_percentage=True, show_fraction=True, use_color=True,
@@ -65,7 +64,7 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
     def __str__(self):
         if self._complete and self._show_complete:
             return f'{self.completed_message}{self.duration}{self.completed}{self.alias}'
-        return (f'{self.prefix}{self.bar}{self.percentage}{self.fraction}'
+        return (f'{self.percentage}{self.fraction}{self.bar}'
                 f'{self.completed}{self.alias}{self.duration}')
 
     @property
@@ -74,7 +73,7 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
             return ''
         tickers = self._ticker * self._modulus_count
         padding = ' ' * (PROGRESS_WIDTH - self._modulus_count)
-        return f"|{tickers}{padding}|"
+        return f" {tickers}{padding}"
 
     @property
     def percentage(self):

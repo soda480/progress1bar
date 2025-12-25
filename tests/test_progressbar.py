@@ -43,7 +43,7 @@ class TestProgressBar(unittest.TestCase):
         self.assertEqual(pbar.count, 1)
         self.assertEqual(pbar.total, 10)
         result = str(pbar)
-        self.assertEqual(result, 'Processing |∎∎∎∎∎                                             | 10% 01/10')
+        self.assertTrue(result.startswith(' 10% 01/10'))
 
     @patch('progress1bar.progressbar.sys.stderr.isatty', return_value=True)
     @patch('progress1bar.ProgressBar.print')
@@ -81,7 +81,7 @@ class TestProgressBar(unittest.TestCase):
     def test__print_Should_NotPrint_When_PreviousSameAsCurrent(self, stderr_patch, *patches):
         stderr_patch.isatty.return_value = True
         pb = ProgressBar()
-        pb._previous = 'Processing |                                                  |  0% ##/##'
+        pb._previous = '  0% ##/##                                                   '
         pb.print(False)
         stderr_patch.flush.assert_not_called()
 

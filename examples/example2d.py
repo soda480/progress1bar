@@ -6,7 +6,6 @@ from progress1bar import ProgressBar
 kwargs = {
     'clear_alias': True,
     'show_complete': False,
-    'show_prefix': False,
     'show_duration': True,
     'show_bar': False,
     'regex': {

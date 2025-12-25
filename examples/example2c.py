@@ -7,7 +7,6 @@ kwargs = {
     'total': 575,
     'clear_alias': True,
     'show_complete': False,
-    'show_prefix': False,
     'show_duration': True,
     'show_bar': False,
     'use_color': True
