@@ -1,6 +1,6 @@
 [![ci](https://github.com/soda480/progress1bar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soda480/progress1bar/actions/workflows/ci.yml)
 ![Coverage](https://raw.githubusercontent.com/soda480/threaded-order/main/badges/coverage.svg)
-[![PyPI version](https://badge.fury.io/py/progress1bar.svg)](https://badge.fury.io/py/progress1bar)
+[![PyPI version](https://badge.fury.io/py/progress1bar.svg?icon=si%3Apython)](https://badge.fury.io/py/progress1bar)
 
 # progress1bar
 
@@ -80,9 +80,9 @@ ProgressBar(
 | `show_percentage`   | `bool` | Show percent complete                             | `True`                  |
 | `show_duration`     | `bool` | Print elapsed time after completion               | `False`                 |
 | `show_complete`     | `bool` | Show completion message                           | `True`                  |
-| `use_color`         | `bool` | ANSI color output                                 | `True`                  |
+| `use_color`         | `bool` | Alias is displayed in color                       | `True`                  |
 | `show_bar`          | `bool` | Render ticker characters (the “bar” itself)       | `True`                  |
-| `ticker`            | `int`  | Unicode code point to use as the ticker character | `9632` (`■`)            |
+| `ticker`            | `int` or `str`  | Unicode code point to use as the ticker character - (must be in the range 33–65532). Useful when color output is disabled.<br>A single character or ANSI-styled string. Intended for colored or styled output.| `9632` (`■`)            |
 
 ### Number formatting (`fill`)
 

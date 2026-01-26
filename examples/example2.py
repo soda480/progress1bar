@@ -6,10 +6,13 @@ from progress1bar import ProgressBar
 
 kwargs = {
     'total': 75,
+    'use_color': True,
     'show_complete': False,
     'clear_alias': True,
     'show_duration': False,
     'ticker': Style.BRIGHT + Fore.RED + chr(9644) + Style.RESET_ALL,
+    # 'ticker': '■',
+    # 'ticker': 9646,
 }
 with ProgressBar(**kwargs) as pb:
     for _ in range(pb.total):
