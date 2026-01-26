@@ -41,13 +41,14 @@ class ProgressBar(Prefixable, Durationable, Completable, Resettable, Fillable, M
         self._count = 0
         self._use_color = use_color
         self._control = control
-        if not self._use_color:
-            if ticker and not (32 < ticker < 65533):
-                raise ValueError('ticker value not in supported range')
-            self._ticker = chr(ticker) if ticker else chr(TICKER)
-        else:
-            self._ticker = ticker if ticker else \
-                Style.BRIGHT + Fore.YELLOW + chr(TICKER) + Style.RESET_ALL
+        if ticker is not None:
+            if isinstance(ticker, int):
+                if not (32 < ticker < 65533):
+                    raise ValueError('ticker value not in supported range')
+                ticker = chr(ticker)
+            elif not self._use_color:
+                raise ValueError('ticker must be an integer value when use_color is False')
+        self._ticker = ticker or chr(TICKER)
         # execute total setter
         self.total = total
 
